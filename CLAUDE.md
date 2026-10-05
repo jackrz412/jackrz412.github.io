@@ -23,4 +23,6 @@ It will showcase data analysis and AI engineering projects as he moves from cost
 - Never commit secrets: API keys, tokens, `.env` files.
 
 ## Commands
-To be filled in after the project is created.
+- `npm run dev` — start a local preview at http://localhost:4321 that refreshes as you edit.
+- `npm run build` — build the final site into `dist/` (the same build GitHub Actions runs).
+- `npm run preview` — serve the built `dist/` folder locally to check it before pushing.
