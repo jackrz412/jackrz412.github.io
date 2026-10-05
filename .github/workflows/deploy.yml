@@ -1,0 +1,56 @@
+# Builds the Astro site and publishes it to GitHub Pages.
+name: Deploy to GitHub Pages
+
+on:
+  # Run on every push to the main branch.
+  push:
+    branches: [main]
+  # Also allow running it by hand from the repo's Actions tab.
+  workflow_dispatch:
+
+# Only the minimum access needed: read the code, publish to Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# If two deploys start close together, let the first one finish
+# and skip any in between, so only the latest version goes live.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the site
+        run: npm run build
+
+      - name: Package the built site for Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
