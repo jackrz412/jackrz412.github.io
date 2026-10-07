@@ -41,6 +41,8 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
     </p>
   </header>
 
+  <!-- Setup panel: benchmark, key figures, models -->
+  <div class="intro-panel">
   <!-- About the benchmark -->
   <section id="the-benchmark">
     <h2>The Benchmark</h2>
@@ -72,7 +74,7 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
   <!-- Stat row -->
   <section id="key-figures" aria-labelledby="key-figures-title">
     <h2 id="key-figures-title">Key Figures</h2>
-    <ul>
+    <ul class="stat-tiles">
       <li><strong>{models.length}</strong> models</li>
       <li><strong>{totalAnswers}</strong> graded answers</li>
       <li><strong>{timeRatio}×</strong> time per correct answer, largest vs smallest</li>
@@ -81,9 +83,15 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
   </section>
 
   <!-- Model color key -->
-  <section aria-label="Models">
+  <section id="models-used" aria-labelledby="models-used-title">
+    <h2 id="models-used-title">Models Used</h2>
     <ModelKey />
   </section>
+  </div>
+
+  <!-- Divider between setup and findings -->
+  <hr class="results-rule" />
+  <p class="eyebrow">Results</p>
 
   <!-- Finding 1 -->
   <section id="accuracy-vs-time">
@@ -213,9 +221,62 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
 </BaseLayout>
 
 <style>
+  /* Setup sections sit on a slightly darker card so they read as one block. */
+  .intro-panel {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius);
+  }
+
   /* Extra breathing room above and below the key figures row. */
   #key-figures {
     margin-block: var(--space-6);
+  }
+
+  /* Big-number tiles: 4 across on desktop, wrapping to 2 on phones. */
+  .stat-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stat-tiles li {
+    padding: var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+  }
+
+  .stat-tiles strong {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+  }
+
+  /* Thin line plus a small label marking where the findings begin. */
+  .results-rule {
+    margin: var(--space-7) 0 var(--space-3);
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--space-6);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 </style>
 
