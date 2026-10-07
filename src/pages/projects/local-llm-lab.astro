@@ -44,7 +44,29 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
   <!-- About the benchmark -->
   <section id="the-benchmark">
     <h2>The Benchmark</h2>
-    <p>blank to be added</p>
+    <p>
+      I split the benchmark into two prompt sets covering nine question types. A general set
+      (5 prompts) acts as a baseline of everyday tasks. A specialized set (7 prompts) is built
+      around one economics problem, Okun's Law, and is graded against a regression I ran myself
+      on public FRED data.
+    </p>
+    <p>Together they answer two questions:</p>
+    <ol>
+      <li>Can a local model reliably handle everyday tasks?</li>
+      <li>Can the same model do the work of a junior economic analyst?</li>
+    </ol>
+    <p>
+      Three question types (factual recall, JSON output, and a trap question with no real
+      answer) appear in both sets, which makes them a direct comparison. If a model passes the
+      general version and fails the economics version, the gap is domain knowledge, not basic
+      ability.
+    </p>
+    <p>
+      Each of the {models.length} models answered all 12 prompts {summary.runs_per_prompt} times,
+      for {totalAnswers} graded answers. The results tell me which model to use for later
+      projects, and where a model can't be trusted on its own. In these cases, manual
+      verification will need to be done to ensure maximum accuracy.
+    </p>
   </section>
 
   <!-- Stat row -->
