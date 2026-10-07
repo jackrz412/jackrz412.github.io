@@ -2,6 +2,7 @@
 // Results page for the Local LLM Lab benchmark.
 // All numbers come from summary.json, exported by Local_LLM_Lab/scripts/export_summary.py.
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ModelKey from '../../components/ModelKey.astro';
 import summary from '../../data/llm-lab/summary.json';
 
 const repoUrl = 'https://github.com/jackrz412/local_llm_lab';
@@ -50,14 +51,7 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
 
   <!-- Model color key -->
   <section aria-label="Models">
-    <ul>
-      {models.map((m) => (
-        <li>
-          <span class="swatch" data-model={m.name}></span>
-          <code>{m.name}</code> ({m.size_gb.toFixed(1)} GB)
-        </li>
-      ))}
-    </ul>
+    <ModelKey />
   </section>
 
   <!-- Finding 1 -->
@@ -89,11 +83,13 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
       <input type="checkbox" id="accept-json" />
       Accept JSON in code blocks
     </label>
-    <div class="placeholder">
-      Heatmap: passes out of {summary.runs_per_prompt} runs,
-      for {summary.scorecard.prompts.length} prompts × {models.length} models. The toggle switches
-      between the strict and code-block-accepted grids.
-    </div>
+    <figure>
+      <div id="chart-scorecard"></div>
+      <figcaption>
+        Passes out of {summary.runs_per_prompt} runs for each prompt and model. Darker is more
+        passes. Tick the box to count code-block JSON as a pass.
+      </figcaption>
+    </figure>
   </section>
 
   <!-- Finding 3 -->
@@ -103,9 +99,14 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
       The smaller models' fails were real errors: wrong arithmetic, the wrong economic law,
       broken code and invented data. Even passing answers could contain made-up facts.
     </p>
-    <div class="placeholder">
-      Chart: failure-mode counts per model, as horizontal bars.
-    </div>
+    <figure>
+      <ModelKey />
+      <div id="chart-failures"></div>
+      <figcaption>
+        Each fail was given one failure mode: its main cause. Bars show the number of fails per
+        model, out of {summary.runs_per_prompt * summary.scorecard.prompts.length} answers each.
+      </figcaption>
+    </figure>
 
     <h3>In their own words</h3>
     {summary.quotes.map((q) => (
@@ -130,10 +131,13 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
       To produce each token, a model reads almost all of its weights from memory, so speed is
       roughly memory bandwidth ÷ model size.
     </p>
-    <div class="placeholder">
-      Chart: tokens/s (y) vs model size in GB (x), one point per model, with the
-      curve {summary.hardware.memory_bandwidth_gb_s} GB/s ÷ size.
-    </div>
+    <figure>
+      <div id="chart-speed"></div>
+      <figcaption>
+        Each dot is one model. The dashed curve is the limit the Mac's
+        memory sets: {summary.hardware.memory_bandwidth_gb_s} GB/s ÷ model size.
+      </figcaption>
+    </figure>
   </section>
 
   <!-- Method & limitations -->
@@ -181,28 +185,232 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
   import * as Plot from '@observablehq/plot';
   import summary from '../../data/llm-lab/summary.json';
 
-  // 1. Share the data
-  const data = summary.models.map((m) => ({
-    model: m.name, 
-    passRate: m.pass_rates.all.strict.passed / m.pass_rates.all.strict.total, 
-    secondsPerCorrect: m.seconds_per_correct, 
-  }));
+  // ---- Shared settings, read from tokens.css so the charts match the rest of the page ----
+  const tokens = getComputedStyle(document.documentElement);
+  const token = (name) => tokens.getPropertyValue(name).trim();
+  const ink = token('--color-text');
+  const paper = token('--color-bg');
+  const mono = token('--font-mono');
+  const modelColors = {
+    'llama3.2:3b': token('--model-llama3'),
+    'llama3.1:8b': token('--model-llama8'),
+    'gemma3:12b': token('--model-gemma'),
+  };
+  const modelNames = Object.keys(modelColors);
 
-  //2. Describing the chart
-  const chart = Plot.plot({
-    marks: [
-      Plot.dot(data, { x: 'secondsPerCorrect', y: 'passRate' }),
-    ],
-  });
-
-  // 3. Putting everything on the page
-  document.querySelector('#chart-accuracy').append(chart);
-</script>
-
-<style>
-  /* Temporary: make the chart placeholders visible until the real charts are built. */
-  .placeholder {
-    border: 2px dashed gray;
-    padding: 2rem 1rem;
+  // Options every chart shares: full column width, token fonts, muted axis text.
+  function base(container) {
+    return {
+      width: container.clientWidth,
+      style: {
+        background: 'transparent',
+        color: token('--color-muted'),
+        fontFamily: token('--font-sans'),
+        fontSize: token('--text-sm'),
+      },
+      color: { domain: modelNames, range: Object.values(modelColors) },
+    };
   }
-</style>
+
+  // A model's dot: its color, with a thin paper-colored ring so it stays crisp on the grid.
+  const modelDots = (data, x, y, channels) =>
+    Plot.dot(data, { x, y, fill: 'model', r: 8, stroke: paper, strokeWidth: 2, channels, tip: true });
+
+  // The model's name above its dot, so identity doesn't rely on color alone.
+  const modelLabels = (data, x, y) =>
+    Plot.text(data, {
+      x, y, text: 'model', dy: -18, fill: ink, fontFamily: mono,
+      stroke: paper, strokeWidth: 4, // halo, so grid lines and curves don't cut through the text
+    });
+
+  // ---- Figure 1: accuracy vs time per correct answer ----
+  function drawAccuracy() {
+    const container = document.querySelector('#chart-accuracy');
+    // Pass rate as a whole-number percentage, for the axis and tooltip.
+    const data = summary.models.map((m) => ({
+      model: m.name,
+      passRate: Math.round((100 * m.pass_rates.all.strict.passed) / m.pass_rates.all.strict.total),
+      secondsPerCorrect: m.seconds_per_correct,
+    }));
+    container.append(
+      Plot.plot({
+        ...base(container),
+        height: 360,
+        marginTop: 30,
+        // Fixed ranges with room around the data, so the dots sit inside the chart, not on its edges.
+        x: {
+          domain: [0, 55],
+          ticks: [0, 10, 20, 30, 40, 50],
+          label: 'Seconds per correct answer →',
+          grid: true,
+        },
+        y: {
+          domain: [30, 80],
+          ticks: [30, 40, 50, 60, 70, 80],
+          tickFormat: (d) => `${d}%`,
+          label: '↑ Pass rate (36 answers)',
+          grid: true,
+        },
+        marks: [
+          modelDots(data, 'secondsPerCorrect', 'passRate'),
+          modelLabels(data, 'secondsPerCorrect', 'passRate'),
+        ],
+      }),
+    );
+  }
+
+  // ---- Figure 2: scorecard heatmap, redrawn when the toggle changes ----
+  function drawScorecard(acceptJson) {
+    const container = document.querySelector('#chart-scorecard');
+    const grid = acceptJson ? summary.scorecard.json_accepted : summary.scorecard.strict;
+    const prompts = summary.scorecard.prompts.map((p) => p.id);
+    const runs = summary.runs_per_prompt;
+    const cells = modelNames.flatMap((model) =>
+      prompts.map((prompt, i) => ({ model, prompt, passes: grid[model][i] })),
+    );
+    const options = base(container);
+    container.replaceChildren(
+      Plot.plot({
+        ...options,
+        height: prompts.length * 34 + 50,
+        marginLeft: 130,
+        marginTop: 44,
+        x: { domain: modelNames, axis: null, padding: 0 },
+        y: { domain: prompts, axis: null, padding: 0 },
+        // One hue, light to dark: more passes, darker navy. The slight curve (exponent 0.75)
+        // darkens the 2/3 step enough for light text on it to pass 4.5:1 contrast.
+        color: {
+          type: 'pow',
+          exponent: 0.75,
+          domain: [0, runs],
+          range: [token('--color-border'), token('--color-accent')],
+          interpolate: 'lab',
+        },
+        marks: [
+          // Model names on top, split onto two lines so they fit narrow columns on a phone.
+          Plot.axisX({
+            anchor: 'top', label: null, tickSize: 0, fontFamily: mono, fill: ink,
+            tickFormat: (d) => d.replace(':', '\n'),
+          }),
+          Plot.axisY({ label: null, tickSize: 0, fontFamily: mono, fill: ink }),
+          // inset leaves a 2px paper gap between neighbouring cells.
+          Plot.cell(cells, {
+            x: 'model', y: 'prompt', fill: 'passes', inset: 1, rx: 4,
+            channels: { Model: 'model', Prompt: 'prompt', Passes: (d) => `${d.passes} of ${runs} runs` },
+            tip: { format: { x: false, y: false, fill: false } },
+          }),
+          Plot.text(cells, {
+            x: 'model', y: 'prompt', text: (d) => `${d.passes}/${runs}`,
+            // Light text on the two darkest steps, ink on the lighter ones.
+            fill: (d) => (d.passes >= 2 ? paper : ink),
+          }),
+        ],
+      }),
+    );
+  }
+
+  // ---- Figure 3: failure modes per model ----
+  const failureLabels = {
+    wrong_answer: 'Wrong answer',
+    format: 'Format only',
+    omission: 'Omission',
+    wrong_concept: 'Wrong concept',
+    contradiction: 'Contradiction',
+    hallucination: 'Hallucination',
+    broken_code: 'Broken code',
+    no_answer: 'No answer',
+  };
+
+  function drawFailures() {
+    const container = document.querySelector('#chart-failures');
+    // Every model gets a row in every group (0 when it had none), so bar positions stay fixed.
+    const totals = {};
+    for (const m of summary.models) {
+      for (const [mode, count] of Object.entries(m.failure_modes)) {
+        totals[mode] = (totals[mode] ?? 0) + count;
+      }
+    }
+    const modes = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
+    const rows = modes.flatMap((mode) =>
+      summary.models.map((m) => ({
+        mode: failureLabels[mode] ?? mode,
+        model: m.name,
+        count: m.failure_modes[mode] ?? 0,
+      })),
+    );
+    const maxCount = Math.max(...rows.map((r) => r.count));
+    container.append(
+      Plot.plot({
+        ...base(container),
+        height: modes.length * 66 + 40,
+        marginLeft: 110,
+        marginRight: 24,
+        x: { domain: [0, maxCount + 1], label: 'Fails →', grid: true, ticks: 5 },
+        y: { domain: modelNames, axis: null, padding: 0.1 },
+        fy: { domain: modes.map((m) => failureLabels[m] ?? m), label: null, padding: 0.25 },
+        marks: [
+          Plot.axisFy({ anchor: 'left', label: null, tickSize: 0, fill: ink }),
+          Plot.barX(rows, {
+            x: 'count', y: 'model', fy: 'mode', fill: 'model',
+            // Rounded at the data end, square at the baseline.
+            rx2y1: 4, rx2y2: 4,
+            channels: { Model: 'model' },
+            tip: { format: { y: false, fill: false } },
+          }),
+          // Count at the end of each bar (zeros have no bar, so no label).
+          Plot.text(rows.filter((r) => r.count > 0), {
+            x: 'count', y: 'model', fy: 'mode', text: 'count',
+            dx: 6, textAnchor: 'start', fill: ink,
+          }),
+        ],
+      }),
+    );
+  }
+
+  // ---- Under the hood: generation speed vs model size ----
+  function drawSpeed() {
+    const container = document.querySelector('#chart-speed');
+    const bandwidth = summary.hardware.memory_bandwidth_gb_s;
+    const data = summary.models.map((m) => ({
+      model: m.name,
+      sizeGb: m.size_gb,
+      tokensPerSecond: m.tokens_per_second,
+      usedGbPerSecond: Math.round(m.size_gb * m.tokens_per_second),
+    }));
+    // The bandwidth limit: tokens/s = bandwidth ÷ size, drawn where it fits on the chart.
+    const curve = [];
+    for (let size = bandwidth / 60; size <= 10; size += 0.05) {
+      curve.push({ sizeGb: size, tokensPerSecond: bandwidth / size });
+    }
+    container.append(
+      Plot.plot({
+        ...base(container),
+        height: 360,
+        marginTop: 30,
+        x: { domain: [0, 10], ticks: [0, 2, 4, 6, 8, 10], label: 'Model size (GB) →', grid: true },
+        y: { domain: [0, 60], ticks: [0, 10, 20, 30, 40, 50, 60], label: '↑ Tokens per second', grid: true },
+        marks: [
+          Plot.line(curve, {
+            x: 'sizeGb', y: 'tokensPerSecond',
+            stroke: token('--color-muted'), strokeWidth: 2, strokeDasharray: '4 4',
+          }),
+          Plot.text([{ sizeGb: 10, tokensPerSecond: bandwidth / 10 }], {
+            x: 'sizeGb', y: 'tokensPerSecond', text: () => `${bandwidth} GB/s ÷ size`,
+            dy: -12, textAnchor: 'end', fill: token('--color-muted'),
+          }),
+          modelDots(data, 'sizeGb', 'tokensPerSecond', { 'GB/s used': 'usedGbPerSecond' }),
+          modelLabels(data, 'sizeGb', 'tokensPerSecond'),
+        ],
+      }),
+    );
+  }
+
+  drawAccuracy();
+  drawScorecard(false);
+  drawFailures();
+  drawSpeed();
+
+  const toggle = document.querySelector('#accept-json');
+  toggle.checked = false; // browsers can restore a ticked box on reload; keep it in step with the chart
+  toggle.addEventListener('change', () => drawScorecard(toggle.checked));
+</script>

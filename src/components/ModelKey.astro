@@ -1,0 +1,50 @@
+---
+// Color key for the three models; colors come from the --model-* tokens.
+import summary from '../data/llm-lab/summary.json';
+---
+
+<ul class="model-key">
+  {summary.models.map((m) => (
+    <li>
+      <span class="swatch" data-model={m.name}></span>
+      <code>{m.name}</code> ({m.size_gb.toFixed(1)} GB)
+    </li>
+  ))}
+</ul>
+
+<style>
+  .model-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    list-style: none;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  .model-key li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .swatch {
+    width: var(--space-3);
+    height: var(--space-3);
+    border-radius: 50%;
+  }
+
+  .swatch[data-model='llama3.2:3b'] {
+    background: var(--model-llama3);
+  }
+
+  .swatch[data-model='llama3.1:8b'] {
+    background: var(--model-llama8);
+  }
+
+  .swatch[data-model='gemma3:12b'] {
+    background: var(--model-gemma);
+  }
+</style>
