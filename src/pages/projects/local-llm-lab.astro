@@ -70,7 +70,8 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
   </section>
 
   <!-- Stat row -->
-  <section aria-label="Key numbers">
+  <section id="key-figures" aria-labelledby="key-figures-title">
+    <h2 id="key-figures-title">Key Figures</h2>
     <ul>
       <li><strong>{models.length}</strong> models</li>
       <li><strong>{totalAnswers}</strong> graded answers</li>
@@ -210,6 +211,13 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
     </ul>
   </section>
 </BaseLayout>
+
+<style>
+  /* Extra breathing room above and below the key figures row. */
+  #key-figures {
+    margin-block: var(--space-6);
+  }
+</style>
 
 <script>
   import * as Plot from '@observablehq/plot';
