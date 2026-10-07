@@ -20,6 +20,7 @@ const totalFails = models.reduce(
   0,
 );
 const formatFails = models.reduce((sum, m) => sum + (m.failure_modes.format ?? 0), 0);
+const formatFailPct = Math.round((formatFails / totalFails) * 100);
 const gemmaComparable = largest.pass_rates.comparable.json_accepted;
 ---
 
@@ -78,7 +79,7 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
       <li><strong>{models.length}</strong> models</li>
       <li><strong>{totalAnswers}</strong> graded answers</li>
       <li><strong>{timeRatio}×</strong> time per correct answer, largest vs smallest</li>
-      <li><strong>{formatFails} of {totalFails}</strong> fails were format-only</li>
+      <li><strong>{formatFailPct}%</strong> of fails were format-only</li>
     </ul>
   </section>
 
@@ -261,6 +262,12 @@ const gemmaComparable = largest.pass_rates.comparable.json_accepted;
     font-family: var(--font-serif);
     font-size: var(--text-2xl);
     font-weight: var(--weight-semibold);
+  }
+
+  /* Model quotes keep their own line breaks but wrap to the column instead of widening the page. */
+  blockquote pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 
   /* Thin line plus a small label marking where the findings begin. */
