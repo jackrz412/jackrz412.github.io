@@ -1,32 +1,18 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Jack Roberts</title>
-    <meta name="description" content="Data analysis and AI engineering projects by Jack Roberts." />
-  </head>
-  <body>
-    <main>
-      <header>
-        <h1>Jack Roberts</h1>
-        <p>Data analysis and AI engineering projects.</p>
-      </header>
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
 
-      <section>
-        <h2>Projects</h2>
-        <p>Projects coming soon.</p>
-      </section>
-    </main>
-  </body>
-</html>
+<BaseLayout
+  title="Jack Roberts"
+  description="Data analysis and AI engineering projects by Jack Roberts."
+>
+  <header>
+    <h1>Jack Roberts</h1>
+    <p>Data analysis and AI engineering projects.</p>
+  </header>
 
-<style>
-  main {
-    max-width: 40rem;
-    margin: 0 auto;
-    padding: 3rem 1rem;
-    font-family: system-ui, sans-serif;
-    line-height: 1.6;
-  }
-</style>
+  <section>
+    <h2>Projects</h2>
+    <p>Projects coming soon.</p>
+  </section>
+</BaseLayout>

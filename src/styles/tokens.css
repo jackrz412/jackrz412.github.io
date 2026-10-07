@@ -1,0 +1,51 @@
+/* src/styles/tokens.css
+   Design decisions for jackrz412.github.io. Change values here, not in components. */
+:root {
+  /* ---- Fonts: IBM Plex family ---- */
+  --font-serif: "IBM Plex Serif", Georgia, serif;          /* headings */
+  --font-sans:  "IBM Plex Sans", system-ui, sans-serif;    /* body, UI, charts */
+  --font-mono:  "IBM Plex Mono", ui-monospace, monospace;  /* model names, IDs, quotes */
+
+  /* ---- Type scale: base 17px, ratio ~1.25 ---- */
+  --text-sm:   0.8125rem;  /* 13px: captions, chart labels, source notes */
+  --text-base: 1.0625rem;  /* 17px: body; Plex Sans runs wide, so 17 reads like 18 */
+  --text-lg:   1.3125rem;  /* 21px: lead paragraph / takeaway sentence */
+  --text-xl:   1.625rem;   /* 26px: section headings (the findings) */
+  --text-2xl:  2.125rem;   /* 34px: page headline on mobile */
+  --text-3xl:  2.625rem;   /* 42px: page headline on desktop */
+
+  --leading-body:  1.6;    /* line height for paragraphs: airy enough to read */
+  --leading-tight: 1.2;    /* line height for headings: big text needs less */
+
+  --weight-regular: 400;
+  --weight-semibold: 600;  /* headings and emphasis; only load 400 + 600 */
+
+  /* ---- Color: neutrals ---- */
+  --color-bg:     #FAF8F3;  /* soft paper */
+  --color-text:   #1D1C1A;  /* sumi ink, 16.0:1 */
+  --color-muted:  #5E5A53;  /* captions, secondary, 6.5:1 */
+  --color-border: #E4DFD4;  /* dividers, card edges */
+  --color-surface: #F3F0E8; /* slightly darker paper for cards/callouts */
+
+  /* ---- Color: accent ---- */
+  --color-accent: #1F4E79;  /* navy: links, toggle, focus outline, 8.2:1 */
+
+  /* ---- Color: models (same everywhere; colorblind-safe) ---- */
+  --model-gemma:  #0072B2;  /* gemma3:12b, blue, 4.9:1 */
+  --model-llama8: #D55E00;  /* llama3.1:8b, vermillion, 3.6:1 */
+  --model-llama3: #008566;  /* llama3.2:3b, bluish green, 4.4:1 */
+
+  /* ---- Spacing scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;   /* between major sections */
+
+  /* ---- Layout ---- */
+  --content-width: 42rem;  /* ~672px ≈ 70 characters of body text */
+  --wide-width:    56rem;  /* charts can break out a bit wider than text */
+  --radius:        6px;    /* soft corners on cards and the toggle */
+}

@@ -1,0 +1,208 @@
+---
+// Results page for the Local LLM Lab benchmark.
+// All numbers come from summary.json, exported by Local_LLM_Lab/scripts/export_summary.py.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import summary from '../../data/llm-lab/summary.json';
+
+const repoUrl = 'https://github.com/jackrz412/local_llm_lab';
+const findingsUrl = `${repoUrl}/blob/main/results/Analyzed%20Results/FINDINGS.md`;
+
+const models = summary.models;
+const byName = Object.fromEntries(models.map((m) => [m.name, m]));
+const fastest = byName['llama3.2:3b'];
+const largest = byName['gemma3:12b'];
+
+const totalAnswers = models.reduce((sum, m) => sum + m.pass_rates.all.strict.total, 0);
+const timeRatio = Math.round(largest.seconds_per_correct / fastest.seconds_per_correct);
+const totalFails = models.reduce(
+  (sum, m) => sum + Object.values(m.failure_modes).reduce((a, b) => a + b, 0),
+  0,
+);
+const formatFails = models.reduce((sum, m) => sum + (m.failure_modes.format ?? 0), 0);
+const gemmaComparable = largest.pass_rates.comparable.json_accepted;
+---
+
+<BaseLayout
+  title="Local LLM Lab | Jack Roberts"
+  description="Three open LLMs benchmarked on a 16 GB Mac: accuracy, speed, and why answers failed."
+>
+  <p><a href="/">← Home</a></p>
+
+  <!-- Headline + takeaway -->
+  <header>
+    <h1>Local LLM Lab</h1>
+    <p>
+      Three open models, run entirely on a 16 GB Mac. The biggest one was the most accurate,
+      but it took {timeRatio}× as long per correct answer. Many of the "failures" were only
+      about formatting.
+    </p>
+  </header>
+
+  <!-- Stat row -->
+  <section aria-label="Key numbers">
+    <ul>
+      <li><strong>{models.length}</strong> models</li>
+      <li><strong>{totalAnswers}</strong> graded answers</li>
+      <li><strong>{timeRatio}×</strong> time per correct answer, largest vs smallest</li>
+      <li><strong>{formatFails} of {totalFails}</strong> fails were format-only</li>
+    </ul>
+  </section>
+
+  <!-- Model color key -->
+  <section aria-label="Models">
+    <ul>
+      {models.map((m) => (
+        <li>
+          <span class="swatch" data-model={m.name}></span>
+          <code>{m.name}</code> ({m.size_gb.toFixed(1)} GB)
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- Finding 1 -->
+  <section id="accuracy-vs-time">
+    <h2>1. More accurate, but much slower</h2>
+    <p>
+      <code>gemma3:12b</code> passed {largest.pass_rates.all.strict.passed} of
+      the {largest.pass_rates.all.strict.total} answers and gave the same verdict on every run
+      of every prompt. It needed {largest.seconds_per_correct} seconds per correct answer,
+      against {fastest.seconds_per_correct} for <code>llama3.2:3b</code>.
+    </p>
+    <figure>
+      <div id="chart-accuracy"></div>
+      <figcaption>
+        Each dot corresponds to one model. Higher is more accurate, and further left is faster per correct answer.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- Finding 2 -->
+  <section id="scorecard">
+    <h2>2. A quarter of the fails were only about format</h2>
+    <p>
+      Of the {totalFails} fails, {formatFails} were correct JSON wrapped in a Markdown code
+      block. Accept that, and leave out the two prompts every model failed, and Gemma
+      passes {gemmaComparable.passed} of {gemmaComparable.total}.
+    </p>
+    <label>
+      <input type="checkbox" id="accept-json" />
+      Accept JSON in code blocks
+    </label>
+    <div class="placeholder">
+      Heatmap: passes out of {summary.runs_per_prompt} runs,
+      for {summary.scorecard.prompts.length} prompts × {models.length} models. The toggle switches
+      between the strict and code-block-accepted grids.
+    </div>
+  </section>
+
+  <!-- Finding 3 -->
+  <section id="failure-modes">
+    <h2>3. Why answers failed</h2>
+    <p>
+      The smaller models' fails were real errors: wrong arithmetic, the wrong economic law,
+      broken code and invented data. Even passing answers could contain made-up facts.
+    </p>
+    <div class="placeholder">
+      Chart: failure-mode counts per model, as horizontal bars.
+    </div>
+
+    <h3>In their own words</h3>
+    {summary.quotes.map((q) => (
+      <figure>
+        {q.excerpts.map((e) => (
+          <blockquote>
+            <p>Run {e.runs.join(' and ')}:</p>
+            <pre>{e.text}</pre>
+          </blockquote>
+        ))}
+        <figcaption>
+          <code>{q.model}</code>, <code>{q.prompt_id}</code>: {q.caption}
+        </figcaption>
+      </figure>
+    ))}
+  </section>
+
+  <!-- Under the hood -->
+  <section id="under-the-hood">
+    <h2>Under the hood: speed follows size</h2>
+    <p>
+      To produce each token, a model reads almost all of its weights from memory, so speed is
+      roughly memory bandwidth ÷ model size.
+    </p>
+    <div class="placeholder">
+      Chart: tokens/s (y) vs model size in GB (x), one point per model, with the
+      curve {summary.hardware.memory_bandwidth_gb_s} GB/s ÷ size.
+    </div>
+  </section>
+
+  <!-- Method & limitations -->
+  <details>
+    <summary>Method &amp; limitations</summary>
+    <h3>Method</h3>
+    <ul>
+      <li>
+        Models ran locally through Ollama on an {summary.hardware.machine}, with default
+        settings. Each answered 12 prompts {summary.runs_per_prompt} times.
+      </li>
+      <li>
+        Two prompt sets: general tasks (factual recall, arithmetic, summary, JSON output, a
+        trap question) and Okun's Law tasks. The Okun's Law tasks are graded against a
+        regression on public FRED data, 1960–2024 (slope {summary.okun_ground_truth.slope}).
+      </li>
+      <li>
+        Answers were graded by automatic checks, with 9 graded by hand. Each fail was given one
+        failure mode: its main cause.
+      </li>
+    </ul>
+    <h3>Limitations</h3>
+    <ul>
+      <li>Small sample: 12 prompts × 3 runs. A difference of a few fails is not meaningful.</li>
+      <li>One machine and default settings, so timings vary between runs.</li>
+      <li>Automatic checks rely on keywords and patterns, and one person did the hand grading.</li>
+      <li>
+        The <code>okun-interpret</code> prompt was flawed, and <code>okun-compute</code> was
+        designed to fail. That's why the comparable rates leave out both.
+      </li>
+    </ul>
+  </details>
+
+  <!-- Links -->
+  <section id="links">
+    <h2>Code and data</h2>
+    <ul>
+      <li><a href={repoUrl}>Source code on GitHub</a></li>
+      <li><a href={findingsUrl}>Full write-up (FINDINGS.md)</a></li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<script>
+  import * as Plot from '@observablehq/plot';
+  import summary from '../../data/llm-lab/summary.json';
+
+  // 1. Share the data
+  const data = summary.models.map((m) => ({
+    model: m.name, 
+    passRate: m.pass_rates.all.strict.passed / m.pass_rates.all.strict.total, 
+    secondsPerCorrect: m.seconds_per_correct, 
+  }));
+
+  //2. Describing the chart
+  const chart = Plot.plot({
+    marks: [
+      Plot.dot(data, { x: 'secondsPerCorrect', y: 'passRate' }),
+    ],
+  });
+
+  // 3. Putting everything on the page
+  document.querySelector('#chart-accuracy').append(chart);
+</script>
+
+<style>
+  /* Temporary: make the chart placeholders visible until the real charts are built. */
+  .placeholder {
+    border: 2px dashed gray;
+    padding: 2rem 1rem;
+  }
+</style>
