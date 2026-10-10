@@ -23,8 +23,45 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
   </head>
   <body>
+    <!-- Reading progress: a line across the top that fills as the page scrolls. -->
+    <div class="progress" aria-hidden="true"></div>
     <main>
       <slot />
     </main>
   </body>
 </html>
+
+<style>
+  /* Hidden unless the browser supports scroll-driven animation and the visitor hasn't asked
+     for reduced motion. Scrolling already shows position, so nothing is lost without it. */
+  .progress {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .progress {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        width: 100%;
+        height: 2px;
+        background: var(--color-accent);
+        transform-origin: left;
+        transform: scaleX(0);
+        /* The animation's progress follows the page's scroll position instead of time.
+           animation-timeline comes after the shorthand, which would otherwise reset it. */
+        animation: progress-fill linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+
+  @keyframes progress-fill {
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>

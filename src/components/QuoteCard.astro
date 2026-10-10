@@ -1,0 +1,152 @@
+---
+// One model quote on a card: a 1x3 table (model, prompt, run) on top, the output centered
+// below, and an explanation of the grade. Quotes come from summary.json's `quotes`.
+interface Props {
+  model: string;
+  promptId: string;
+  caption: string;
+  excerpts: { runs: number[]; grade: string; text: string }[];
+}
+
+const { model, promptId, caption, excerpts } = Astro.props;
+
+// Every run the card quotes, e.g. [1, 2] -> "1 and 2".
+const runs = [...new Set(excerpts.flatMap((e) => e.runs))].sort((a, b) => a - b);
+const runText = runs.join(' and ');
+// Only label each excerpt with its run when the card mixes runs.
+const labelRuns = runs.length > 1;
+// Some quotes are passing answers with a flaw, so the explanation's tag shows the grade.
+const grade = excerpts.some((e) => e.grade === 'fail') ? 'fail' : 'pass';
+---
+
+<figure class="quote-card">
+  <table>
+    <tr>
+      <td><span class="label">Model</span><code>{model}</code></td>
+      <td><span class="label">Question</span><code>{promptId}</code></td>
+      <td><span class="label">Run</span><code>{runText}</code></td>
+    </tr>
+  </table>
+
+  <span class="tag">Model output</span>
+  <div class="output">
+    {excerpts.map((e) => (
+      <blockquote>
+        {labelRuns && <p class="label">Run {e.runs.join(' and ')}</p>}
+        <pre>{e.text}</pre>
+      </blockquote>
+    ))}
+  </div>
+
+  <figcaption>
+    <span class="tag">Explanation <span class:list={['grade', grade]}>{grade}</span></span>
+    <p>{caption}</p>
+  </figcaption>
+</figure>
+
+<style>
+  /* A column: table on top, output filling the middle, explanation at the bottom. When a parent
+     stretches the card taller than its content, the output stays centered in the extra space. */
+  .quote-card {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  /* Header: three equal cells in one row, small text, with a smaller muted label above each value. */
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  td {
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  td code {
+    font-size: 1em;
+  }
+
+  td .label {
+    font-size: 0.85em;
+  }
+
+  .label {
+    display: block;
+    margin: 0 0 2px;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Small outlined tag naming each part of the card. align-self keeps it from stretching. */
+  .tag {
+    align-self: flex-start;
+    display: inline-block;
+    margin-top: var(--space-3);
+    padding: 1px var(--space-2);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: var(--text-sm);
+  }
+
+  /* The grade word in the explanation tag: green for pass, red for fail. */
+  .grade {
+    font-weight: var(--weight-semibold);
+  }
+
+  .grade.pass {
+    color: var(--grade-pass);
+  }
+
+  .grade.fail {
+    color: var(--grade-fail);
+  }
+
+  /* The output sits centered in the card; its lines stay left-aligned so code and data rows keep their shape. */
+  .output {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0 var(--space-4);
+  }
+
+  blockquote {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  /* Keep the model's line breaks, but wrap to the card instead of widening the page. */
+  pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: var(--text-md);
+  }
+
+  figcaption p {
+    margin: var(--space-2) 0 0;
+  }
+</style>

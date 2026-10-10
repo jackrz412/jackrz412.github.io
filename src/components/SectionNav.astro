@@ -1,0 +1,99 @@
+---
+// A list of the page's sections in the left margin, on wide screens only. The script builds it
+// from every <section id> in <main> that has an h2, using the h2's text (or the section's
+// data-nav-label, for a shorter label), and marks the section in view with aria-current.
+// Hidden until the script fills it, so without JavaScript nothing half-built shows.
+---
+
+<nav class="section-nav" aria-label="On this page" hidden>
+  <ol></ol>
+</nav>
+
+<script>
+  const nav = document.querySelector('.section-nav');
+  const list = nav.querySelector('ol');
+  const sections = [...document.querySelectorAll('main section[id]')].filter((s) => s.querySelector('h2'));
+
+  const links = new Map();
+  for (const section of sections) {
+    const link = document.createElement('a');
+    link.href = `#${section.id}`;
+    link.textContent = section.dataset.navLabel ?? section.querySelector('h2').textContent.trim();
+    const item = document.createElement('li');
+    item.append(link);
+    list.append(item);
+    links.set(section, link);
+  }
+  nav.hidden = sections.length === 0;
+
+  // The current section is the first one crossing a band from 20% to 40% down the window.
+  // Between sections (e.g. in the Method details), the last one stays marked.
+  const inBand = new Set();
+  const setCurrent = (section) => {
+    for (const [s, link] of links) {
+      if (s === section) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    }
+  };
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) inBand.add(entry.target);
+        else inBand.delete(entry.target);
+      }
+      const first = sections.find((s) => inBand.has(s));
+      if (first) setCurrent(first);
+    },
+    { rootMargin: '-20% 0px -60% 0px' },
+  );
+  sections.forEach((s) => observer.observe(s));
+</script>
+
+<style>
+  /* Only where the margin beside the 42rem column fits a 13rem list: 42 + 2 × (13 + 2) = 72rem.
+     Media queries can't read custom properties, so the width is written out. */
+  .section-nav {
+    display: none;
+  }
+
+  @media (min-width: 72rem) {
+    .section-nav:not([hidden]) {
+      display: block;
+      position: fixed;
+      top: var(--space-6);
+      left: calc((100vw - var(--content-width)) / 2 - 13rem - var(--space-5));
+      width: 13rem;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+  }
+
+  li + li {
+    margin-top: var(--space-2);
+  }
+
+  /* A left bar marks each item; it turns accent for the current section. */
+  a {
+    display: block;
+    padding-left: var(--space-2);
+    border-left: 2px solid var(--color-border);
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-text);
+  }
+
+  a[aria-current] {
+    border-left-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+</style>

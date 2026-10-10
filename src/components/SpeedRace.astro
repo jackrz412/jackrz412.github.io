@@ -1,0 +1,199 @@
+---
+// Speed race: every model types the same sentence at its measured speed, one row per model,
+// smallest model first. Characters per second = tokens per second × that model's characters
+// per answer token (both from summary.json). The HTML is the finished race, so without
+// JavaScript or with reduced motion it reads as a table of results; the script replays it.
+import summary from '../data/llm-lab/summary.json';
+
+// 25 words, the kind of sentence the benchmark asked for.
+const sentence =
+  "Okun's Law says that when unemployment rises by one point above its natural rate, output tends to fall about two points below its potential level.";
+
+// Thinking models: the race shows answer speed only, without the time spent thinking first.
+const thinkingModels = ['qwen3.5:9b'];
+
+const rows = [...summary.models]
+  .sort((a, b) => a.size_gb - b.size_gb)
+  .map((m) => {
+    const charsPerSecond = m.tokens_per_second * m.chars_per_token;
+    return {
+      name: m.name,
+      sizeGb: m.size_gb,
+      tokensPerSecond: m.tokens_per_second,
+      charsPerSecond,
+      seconds: sentence.length / charsPerSecond,
+      thinking: thinkingModels.includes(m.name),
+    };
+  });
+---
+
+<figure class="speed-race">
+  <ol>
+    {rows.map((r) => (
+      <li data-chars-per-second={r.charsPerSecond}>
+        <p class="race-label">
+          <code class="model-name" data-model={r.name}>{r.name}</code>
+          <span class="race-speed">{r.tokensPerSecond} tokens/s · {r.sizeGb.toFixed(1)} GB</span>
+          {r.thinking && <span class="race-note">answer-only speed (thinking time excluded)</span>}
+          <span class="race-time">{r.seconds.toFixed(1)} s</span>
+        </p>
+        <p class="race-text" aria-hidden="true"><span class="typed">{sentence}</span><span class="untyped"></span></p>
+      </li>
+    ))}
+  </ol>
+  <button type="button" class="race-replay" hidden>Replay</button>
+  <figcaption>
+    The same {sentence.split(' ').length}-word sentence, typed at each model's measured speed:
+    tokens per second × that model's characters per token in its run 2 answers. Times are how
+    long each took to write it. Thinking models start typing only after they finish thinking,
+    which this leaves out.
+  </figcaption>
+</figure>
+
+<script>
+  // Replays the race when it scrolls into view (once), and on Replay. Under reduced motion the
+  // script does nothing, and the finished race from the HTML stays as it is.
+  const race = document.querySelector('.speed-race');
+  const motionOk = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  if (race && motionOk) {
+    const rows = [...race.querySelectorAll('li')].map((li) => {
+      const typed = li.querySelector('.typed');
+      return {
+        li,
+        typed,
+        untyped: li.querySelector('.untyped'),
+        text: typed.textContent,
+        charsPerSecond: Number(li.dataset.charsPerSecond),
+      };
+    });
+    const replay = race.querySelector('.race-replay');
+
+    // Not started: no text typed and no times. The untyped part stays in place (invisible), so
+    // rows keep their full height and nothing below jumps as the text appears.
+    const reset = () => {
+      for (const row of rows) {
+        row.typed.textContent = '';
+        row.untyped.textContent = row.text;
+        row.li.classList.remove('finished');
+      }
+    };
+
+    let frame = null;
+    const run = () => {
+      cancelAnimationFrame(frame);
+      reset();
+      const start = performance.now();
+      const tick = (now) => {
+        const seconds = (now - start) / 1000;
+        let running = false;
+        for (const row of rows) {
+          const shown = Math.min(row.text.length, Math.floor(seconds * row.charsPerSecond));
+          row.typed.textContent = row.text.slice(0, shown);
+          row.untyped.textContent = row.text.slice(shown);
+          if (shown === row.text.length) row.li.classList.add('finished');
+          else running = true;
+        }
+        if (running) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+    };
+
+    reset();
+    race.classList.add('racing');
+    replay.hidden = false;
+    replay.addEventListener('click', run);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        observer.disconnect();
+        run();
+      },
+      { threshold: 0.5 }, // start once half the race is on screen
+    );
+    observer.observe(race);
+  }
+</script>
+
+<style>
+  .speed-race {
+    margin: var(--space-4) 0;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li + li {
+    margin-top: var(--space-3);
+  }
+
+  /* Model name, its speed and size, then the finish time at the right. */
+  .race-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .race-speed,
+  .race-note {
+    color: var(--color-muted);
+  }
+
+  .race-note {
+    font-style: italic;
+  }
+
+  .race-time {
+    margin-left: auto;
+    color: var(--color-text);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* While the race runs, a row's time appears only once it finishes. */
+  .racing li:not(.finished) .race-time {
+    visibility: hidden;
+  }
+
+  .race-text {
+    margin: 0;
+    padding: var(--space-2);
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .untyped {
+    visibility: hidden;
+  }
+
+  .race-replay {
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    color: var(--color-accent);
+    background: var(--color-bg);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .race-replay:hover {
+    background: var(--color-surface);
+  }
+
+  figcaption {
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+</style>

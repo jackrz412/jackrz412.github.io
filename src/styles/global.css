@@ -24,6 +24,12 @@ a {
   text-decoration: underline;
 }
 
+/* A jump to a section (from the section nav or any #link) stops a little short of it,
+   so the heading has room above it instead of touching the top of the window. */
+section[id] {
+  scroll-margin-top: var(--space-5);
+}
+
 h1,
 h2,
 h3 {
@@ -33,8 +39,9 @@ h3 {
   line-height: var(--leading-tight);
 }
 
+/* Grows with the screen: --text-2xl on phones up to --text-3xl on desktop. */
 h1 {
-  font-size: var(--text-2xl);
+  font-size: clamp(var(--text-2xl), 6vw, var(--text-3xl));
 }
 
 h2 {
@@ -49,4 +56,62 @@ h3 {
 code {
   font-family: var(--font-mono);
   font-size: 0.9em;
+}
+
+/* A model's name in running text: its chart hue as text on a light tint of that hue, so prose
+   ties to the charts. Set data-model to the model's name. nowrap keeps "llama3.2:3b" on one line. */
+.model-name {
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.model-name[data-model='llama3.2:3b'] {
+  color: var(--model-llama3-text);
+  background: var(--model-llama3-tint);
+}
+
+.model-name[data-model='llama3.1:8b'] {
+  color: var(--model-llama8-text);
+  background: var(--model-llama8-tint);
+}
+
+.model-name[data-model='gemma3:12b'] {
+  color: var(--model-gemma-text);
+  background: var(--model-gemma-tint);
+}
+
+.model-name[data-model='phi4-mini'] {
+  color: var(--model-phi4-text);
+  background: var(--model-phi4-tint);
+}
+
+.model-name[data-model='qwen3.5:9b'] {
+  color: var(--model-qwen-text);
+  background: var(--model-qwen-tint);
+}
+
+/* Keyboard focus: an accent outline on anything focusable, shown only for keyboard use. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Linked highlighting (set by the page script): one model is active, the rest are dimmed.
+   Chart marks and color-key items dim; model names in text never dim, since faded text is hard
+   to read. Instead the matching names get a ring in their own text color. */
+svg .is-dimmed,
+.model-key .is-dimmed {
+  opacity: 0.25;
+}
+
+.model-name.is-active {
+  box-shadow: 0 0 0 1px currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  svg [data-model],
+  .model-key [data-model] {
+    transition: opacity var(--duration-fast) var(--ease);
+  }
 }

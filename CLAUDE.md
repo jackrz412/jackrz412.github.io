@@ -10,6 +10,7 @@ It will showcase data analysis and AI engineering projects as he moves from cost
 - Prefer the simplest approach that works. Don't add frameworks, libraries, or abstractions we don't need yet.
 - Make small, focused changes, and pause after each one so I can review it before you continue.
 - Don't commit or push unless I ask you to. I want to run Git myself while I'm learning it.
+- Follow DESIGN.md for all UI and styling work.
 
 ## Stack (decided)
 - Astro static site, built to plain HTML/CSS/JS.

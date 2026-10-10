@@ -12,9 +12,14 @@
     {
       "name": "llama3.2:3b",
       "size_gb": 2.0,
-      "tokens_per_second": 46.1,
-      "total_seconds": 181.9,
-      "seconds_per_correct": 9.1,
+      "tokens_per_second": 46.2,
+      "chars_per_token": 3.86,
+      "total_seconds": 171.7,
+      "seconds_per_correct": 8.6,
+      "seconds_per_answer": {
+        "before_answer": 0.3,
+        "writing_answer": 4.5
+      },
       "pass_rates": {
         "all": {
           "strict": {
@@ -38,20 +43,25 @@
         }
       },
       "failure_modes": {
-        "wrong_answer": 7,
-        "omission": 3,
-        "wrong_concept": 2,
+        "wrong_answer": 5,
+        "omission": 4,
+        "hallucination": 3,
         "broken_code": 2,
-        "contradiction": 1,
-        "hallucination": 1
+        "wrong_concept": 1,
+        "contradiction": 1
       }
     },
     {
       "name": "llama3.1:8b",
       "size_gb": 4.9,
-      "tokens_per_second": 21.3,
-      "total_seconds": 398.5,
-      "seconds_per_correct": 24.9,
+      "tokens_per_second": 21.5,
+      "chars_per_token": 4.05,
+      "total_seconds": 376.8,
+      "seconds_per_correct": 23.6,
+      "seconds_per_answer": {
+        "before_answer": 0.6,
+        "writing_answer": 9.8
+      },
       "pass_rates": {
         "all": {
           "strict": {
@@ -78,43 +88,129 @@
         "wrong_answer": 8,
         "format": 6,
         "omission": 3,
-        "contradiction": 1,
         "wrong_concept": 1,
+        "broken_code": 1,
         "hallucination": 1
       }
     },
     {
       "name": "gemma3:12b",
       "size_gb": 8.1,
-      "tokens_per_second": 13.0,
-      "total_seconds": 1081.2,
-      "seconds_per_correct": 45.0,
+      "tokens_per_second": 13.1,
+      "chars_per_token": 2.81,
+      "total_seconds": 1079.3,
+      "seconds_per_correct": 56.8,
+      "seconds_per_answer": {
+        "before_answer": 1.6,
+        "writing_answer": 28.4
+      },
       "pass_rates": {
         "all": {
           "strict": {
-            "passed": 24,
+            "passed": 19,
             "total": 36
           },
           "json_accepted": {
-            "passed": 30,
+            "passed": 25,
             "total": 36
           }
         },
         "comparable": {
           "strict": {
-            "passed": 24,
+            "passed": 19,
             "total": 30
           },
           "json_accepted": {
-            "passed": 30,
+            "passed": 25,
             "total": 30
           }
         }
       },
       "failure_modes": {
         "format": 6,
-        "wrong_answer": 3,
-        "omission": 3
+        "wrong_answer": 5,
+        "omission": 3,
+        "hallucination": 2,
+        "contradiction": 1
+      }
+    },
+    {
+      "name": "phi4-mini",
+      "size_gb": 2.5,
+      "tokens_per_second": 37.1,
+      "chars_per_token": 4.15,
+      "total_seconds": 188.7,
+      "seconds_per_correct": 8.6,
+      "seconds_per_answer": {
+        "before_answer": 0.3,
+        "writing_answer": 4.9
+      },
+      "pass_rates": {
+        "all": {
+          "strict": {
+            "passed": 22,
+            "total": 36
+          },
+          "json_accepted": {
+            "passed": 26,
+            "total": 36
+          }
+        },
+        "comparable": {
+          "strict": {
+            "passed": 20,
+            "total": 30
+          },
+          "json_accepted": {
+            "passed": 24,
+            "total": 30
+          }
+        }
+      },
+      "failure_modes": {
+        "wrong_answer": 7,
+        "format": 4,
+        "contradiction": 1,
+        "omission": 1,
+        "hallucination": 1
+      }
+    },
+    {
+      "name": "qwen3.5:9b",
+      "size_gb": 6.6,
+      "tokens_per_second": 17.7,
+      "chars_per_token": 4.16,
+      "total_seconds": 5392.0,
+      "seconds_per_correct": 185.9,
+      "seconds_per_answer": {
+        "before_answer": 140.2,
+        "writing_answer": 9.5
+      },
+      "pass_rates": {
+        "all": {
+          "strict": {
+            "passed": 29,
+            "total": 36
+          },
+          "json_accepted": {
+            "passed": 29,
+            "total": 36
+          }
+        },
+        "comparable": {
+          "strict": {
+            "passed": 27,
+            "total": 30
+          },
+          "json_accepted": {
+            "passed": 27,
+            "total": 30
+          }
+        }
+      },
+      "failure_modes": {
+        "truncated": 6,
+        "omission": 1
       }
     }
   ],
@@ -122,81 +218,93 @@
     "prompts": [
       {
         "id": "factual-01",
-        "set": "general"
+        "set": "general",
+        "text": "What is the chemical symbol for gold, and what is its atomic number? Answer in one sentence."
       },
       {
         "id": "arithmetic-01",
-        "set": "general"
+        "set": "general",
+        "text": "A train leaves at 2:45 PM and travels 150 miles at a steady 60 miles per hour. Halfway through it stops for 20 minutes. What time does it arrive? Show your steps, then give the final answer on the last line as 'Answer: <time>'."
       },
       {
         "id": "summarization-01",
-        "set": "general"
+        "set": "general",
+        "text": "Summarize the following passage in exactly one sentence:\n\nHoneybees communicate the location of food sources using a movement called the waggle dance. A forager returning to the hive walks in a figure-eight pattern, and during the straight middle section she waggles her body from side to side. The angle of that straight run relative to vertical tells other bees the direction of the food relative to the sun, while the length of the waggle run indicates how far away it is. Other bees follow the dancer closely, learn the directions, and then fly out to find the source themselves."
       },
       {
         "id": "json-01",
-        "set": "general"
+        "set": "general",
+        "text": "Return ONLY a JSON object, with no other text, describing the planet Mars. Use exactly these keys: \"name\" (string), \"moons\" (integer), \"order_from_sun\" (integer)."
       },
       {
         "id": "trap-01",
-        "set": "general"
+        "set": "general",
+        "text": "Who was the first person to walk on Mars, and in what year did it happen?"
       },
       {
         "id": "okun-recall",
-        "set": "okun"
+        "set": "okun",
+        "text": "State Okun's Law in one or two sentences, and give its typical coefficient for the United States."
       },
       {
         "id": "okun-reason",
-        "set": "okun"
+        "set": "okun",
+        "text": "Real GDP grows 2 percentage points below its trend rate for one year. According to Okun's Law, what change in the unemployment rate should we expect? Show your reasoning briefly."
       },
       {
         "id": "okun-compute",
-        "set": "okun"
+        "set": "okun",
+        "text": "Below is annual US data, 1960-2024, as CSV. gdp_growth is real GDP growth (%) and unemp_change is the change in the unemployment rate (percentage points), both from annual averages.\n\nyear,gdp_growth,unemp_change\n1960,2.5745,0.0917\n1961,2.5653,1.15\n1962,6.1296,-1.125\n1963,4.3573,0.075\n1964,5.7628,-0.4833\n1965,6.4985,-0.65\n1966,6.5953,-0.7167\n1967,2.7427,0.05\n1968,4.9145,-0.2833\n1969,3.1225,-0.0667\n1970,0.1846,1.4917\n1971,3.2927,0.9667\n1972,5.2555,-0.35\n1973,5.6457,-0.7417\n1974,-0.5405,0.7833\n1975,-0.2056,2.8333\n1976,5.388,-0.775\n1977,4.6242,-0.65\n1978,5.5352,-0.9833\n1979,3.166,-0.2167\n1980,-0.2568,1.325\n1981,2.5377,0.4417\n1982,-1.803,2.0917\n1983,4.5838,-0.1083\n1984,7.2365,-2.0917\n1985,4.1696,-0.3167\n1986,3.4627,-0.1917\n1987,3.4546,-0.825\n1988,4.177,-0.6833\n1989,3.6722,-0.2333\n1990,1.886,0.3583\n1991,-0.1083,1.2333\n1992,3.5225,0.6417\n1993,2.7518,-0.5833\n1994,4.029,-0.8083\n1995,2.6844,-0.5083\n1996,3.7728,-0.1833\n1997,4.4471,-0.4667\n1998,4.4831,-0.4417\n1999,4.7884,-0.2833\n2000,4.0776,-0.25\n2001,0.9555,0.775\n2002,1.7004,1.0417\n2003,2.7956,0.2083\n2004,3.8478,-0.45\n2005,3.4836,-0.4583\n2006,2.7845,-0.475\n2007,2.0039,0.0083\n2008,0.1136,1.1833\n2009,-2.5765,3.4833\n2010,2.6952,0.325\n2011,1.5644,-0.675\n2012,2.2891,-0.8583\n2013,2.1178,-0.7167\n2014,2.5238,-1.2\n2015,2.9455,-0.8833\n2016,1.8195,-0.4\n2017,2.4576,-0.5167\n2018,2.9665,-0.4667\n2019,2.5838,-0.2167\n2020,-2.0814,4.425\n2021,6.2683,-2.75\n2022,2.4296,-1.7\n2023,2.9186,-0.025\n2024,2.9517,0.4\n\nWithout writing or running any code, compute the OLS regression of unemp_change on gdp_growth. Give the slope and intercept, each to 4 decimal places, on the last two lines as 'Slope: <value>' and 'Intercept: <value>'."
       },
       {
         "id": "okun-code",
-        "set": "okun"
+        "set": "okun",
+        "text": "Write a complete Python script that loads a file named okun.csv (columns: year, gdp_growth, unemp_change) and estimates Okun's Law in difference form, regressing unemp_change on gdp_growth, using statsmodels. Print the regression summary. Return only the code."
       },
       {
         "id": "okun-interpret",
-        "set": "okun"
+        "set": "okun",
+        "text": "Below is annual US data, 1960-2024, as CSV. gdp_growth is real GDP growth (%) and unemp_change is the change in the unemployment rate (percentage points), both from annual averages.\n\nyear,gdp_growth,unemp_change\n1960,2.5745,0.0917\n1961,2.5653,1.15\n1962,6.1296,-1.125\n1963,4.3573,0.075\n1964,5.7628,-0.4833\n1965,6.4985,-0.65\n1966,6.5953,-0.7167\n1967,2.7427,0.05\n1968,4.9145,-0.2833\n1969,3.1225,-0.0667\n1970,0.1846,1.4917\n1971,3.2927,0.9667\n1972,5.2555,-0.35\n1973,5.6457,-0.7417\n1974,-0.5405,0.7833\n1975,-0.2056,2.8333\n1976,5.388,-0.775\n1977,4.6242,-0.65\n1978,5.5352,-0.9833\n1979,3.166,-0.2167\n1980,-0.2568,1.325\n1981,2.5377,0.4417\n1982,-1.803,2.0917\n1983,4.5838,-0.1083\n1984,7.2365,-2.0917\n1985,4.1696,-0.3167\n1986,3.4627,-0.1917\n1987,3.4546,-0.825\n1988,4.177,-0.6833\n1989,3.6722,-0.2333\n1990,1.886,0.3583\n1991,-0.1083,1.2333\n1992,3.5225,0.6417\n1993,2.7518,-0.5833\n1994,4.029,-0.8083\n1995,2.6844,-0.5083\n1996,3.7728,-0.1833\n1997,4.4471,-0.4667\n1998,4.4831,-0.4417\n1999,4.7884,-0.2833\n2000,4.0776,-0.25\n2001,0.9555,0.775\n2002,1.7004,1.0417\n2003,2.7956,0.2083\n2004,3.8478,-0.45\n2005,3.4836,-0.4583\n2006,2.7845,-0.475\n2007,2.0039,0.0083\n2008,0.1136,1.1833\n2009,-2.5765,3.4833\n2010,2.6952,0.325\n2011,1.5644,-0.675\n2012,2.2891,-0.8583\n2013,2.1178,-0.7167\n2014,2.5238,-1.2\n2015,2.9455,-0.8833\n2016,1.8195,-0.4\n2017,2.4576,-0.5167\n2018,2.9665,-0.4667\n2019,2.5838,-0.2167\n2020,-2.0814,4.425\n2021,6.2683,-2.75\n2022,2.4296,-1.7\n2023,2.9186,-0.025\n2024,2.9517,0.4\n\nBelow is the output of an OLS regression of Okun's Law in difference form (unemp_change ~ gdp_growth), fitted with statsmodels on this data.\n\nOLS Regression Results                            \n==============================================================================\nDep. Variable:           unemp_change   R-squared:                       0.614\nModel:                            OLS   Adj. R-squared:                  0.607\nMethod:                 Least Squares   F-statistic:                     100.0\n                                        Prob (F-statistic):           1.24e-14\n                                        Log-Likelihood:                -70.087\nNo. Observations:                  65   AIC:                             144.2\nDf Residuals:                      63   BIC:                             148.5\nDf Model:                           1                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P>|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nIntercept      1.2958      0.159      8.133      0.000       0.977       1.614\ngdp_growth    -0.4354      0.044    -10.002      0.000      -0.522      -0.348\n==============================================================================\nOmnibus:                        2.646   Durbin-Watson:                   1.451\nProb(Omnibus):                  0.266   Jarque-Bera (JB):                2.201\nSkew:                           0.021   Prob(JB):                        0.333\nKurtosis:                       3.901   Cond. No.                         6.85\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\nExplain in plain language what the gdp_growth coefficient, the R-squared, and the p-value on gdp_growth mean. Then say whether anything about this sample should worry an analyst."
       },
       {
         "id": "okun-json",
-        "set": "okun"
+        "set": "okun",
+        "text": "Below is the output of an OLS regression of Okun's Law in difference form (unemp_change ~ gdp_growth), fitted with statsmodels on annual US data for 1960-2024.\n\nOLS Regression Results                            \n==============================================================================\nDep. Variable:           unemp_change   R-squared:                       0.614\nModel:                            OLS   Adj. R-squared:                  0.607\nMethod:                 Least Squares   F-statistic:                     100.0\n                                        Prob (F-statistic):           1.24e-14\n                                        Log-Likelihood:                -70.087\nNo. Observations:                  65   AIC:                             144.2\nDf Residuals:                      63   BIC:                             148.5\nDf Model:                           1                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P>|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nIntercept      1.2958      0.159      8.133      0.000       0.977       1.614\ngdp_growth    -0.4354      0.044    -10.002      0.000      -0.522      -0.348\n==============================================================================\nOmnibus:                        2.646   Durbin-Watson:                   1.451\nProb(Omnibus):                  0.266   Jarque-Bera (JB):                2.201\nSkew:                           0.021   Prob(JB):                        0.333\nKurtosis:                       3.901   Cond. No.                         6.85\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\nReturn ONLY a JSON object, with no other text, with exactly these keys: \"slope\" (the gdp_growth coefficient), \"intercept\", and \"r_squared\". Use numbers, not strings."
       },
       {
         "id": "okun-trap",
-        "set": "okun"
+        "set": "okun",
+        "text": "Below is annual US data, 1960-2024, as CSV. gdp_growth is real GDP growth (%) and unemp_change is the change in the unemployment rate (percentage points), both from annual averages.\n\nyear,gdp_growth,unemp_change\n1960,2.5745,0.0917\n1961,2.5653,1.15\n1962,6.1296,-1.125\n1963,4.3573,0.075\n1964,5.7628,-0.4833\n1965,6.4985,-0.65\n1966,6.5953,-0.7167\n1967,2.7427,0.05\n1968,4.9145,-0.2833\n1969,3.1225,-0.0667\n1970,0.1846,1.4917\n1971,3.2927,0.9667\n1972,5.2555,-0.35\n1973,5.6457,-0.7417\n1974,-0.5405,0.7833\n1975,-0.2056,2.8333\n1976,5.388,-0.775\n1977,4.6242,-0.65\n1978,5.5352,-0.9833\n1979,3.166,-0.2167\n1980,-0.2568,1.325\n1981,2.5377,0.4417\n1982,-1.803,2.0917\n1983,4.5838,-0.1083\n1984,7.2365,-2.0917\n1985,4.1696,-0.3167\n1986,3.4627,-0.1917\n1987,3.4546,-0.825\n1988,4.177,-0.6833\n1989,3.6722,-0.2333\n1990,1.886,0.3583\n1991,-0.1083,1.2333\n1992,3.5225,0.6417\n1993,2.7518,-0.5833\n1994,4.029,-0.8083\n1995,2.6844,-0.5083\n1996,3.7728,-0.1833\n1997,4.4471,-0.4667\n1998,4.4831,-0.4417\n1999,4.7884,-0.2833\n2000,4.0776,-0.25\n2001,0.9555,0.775\n2002,1.7004,1.0417\n2003,2.7956,0.2083\n2004,3.8478,-0.45\n2005,3.4836,-0.4583\n2006,2.7845,-0.475\n2007,2.0039,0.0083\n2008,0.1136,1.1833\n2009,-2.5765,3.4833\n2010,2.6952,0.325\n2011,1.5644,-0.675\n2012,2.2891,-0.8583\n2013,2.1178,-0.7167\n2014,2.5238,-1.2\n2015,2.9455,-0.8833\n2016,1.8195,-0.4\n2017,2.4576,-0.5167\n2018,2.9665,-0.4667\n2019,2.5838,-0.2167\n2020,-2.0814,4.425\n2021,6.2683,-2.75\n2022,2.4296,-1.7\n2023,2.9186,-0.025\n2024,2.9517,0.4\n\nIn this data, what is the Okun's Law coefficient for 1950-1959?"
       }
     ],
     "strict": {
       "llama3.2:3b": [
         3,
+        2,
+        3,
+        3,
+        3,
         1,
-        3,
-        3,
-        3,
-        0,
-        1,
-        0,
         1,
         0,
+        1,
+        0,
         3,
-        2
+        0
       ],
       "llama3.1:8b": [
         3,
-        0,
+        2,
         3,
         0,
         3,
         0,
         1,
         0,
-        3,
+        2,
         0,
         0,
-        3
+        2
       ],
       "gemma3:12b": [
         3,
@@ -204,43 +312,71 @@
         3,
         0,
         3,
-        3,
-        3,
         0,
         3,
         0,
+        3,
         0,
+        0,
+        1
+      ],
+      "phi4-mini": [
+        3,
+        2,
+        3,
+        0,
+        3,
+        2,
+        2,
+        0,
+        3,
+        2,
+        0,
+        2
+      ],
+      "qwen3.5:9b": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        3,
+        2,
+        3,
         3
       ]
     },
     "json_accepted": {
       "llama3.2:3b": [
         3,
+        2,
+        3,
+        3,
+        3,
         1,
-        3,
-        3,
-        3,
-        0,
-        1,
-        0,
         1,
         0,
+        1,
+        0,
         3,
-        2
+        0
       ],
       "llama3.1:8b": [
         3,
-        0,
+        2,
         3,
         3,
         3,
         0,
         1,
         0,
-        3,
+        2,
         0,
         3,
-        3
+        2
       ],
       "gemma3:12b": [
         3,
@@ -248,11 +384,39 @@
         3,
         3,
         3,
-        3,
-        3,
         0,
         3,
         0,
+        3,
+        0,
+        3,
+        1
+      ],
+      "phi4-mini": [
+        3,
+        2,
+        3,
+        1,
+        3,
+        2,
+        2,
+        0,
+        3,
+        2,
+        3,
+        2
+      ],
+      "qwen3.5:9b": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        3,
+        2,
         3,
         3
       ]
@@ -268,56 +432,92 @@
     {
       "model": "llama3.2:3b",
       "run": 1,
-      "slope": 0.0041,
-      "intercept": 0.5629
+      "slope": 0.1017,
+      "intercept": 6.0133
     },
     {
       "model": "llama3.2:3b",
       "run": 2,
-      "slope": 0.0347,
-      "intercept": -0.1819
+      "slope": 0.0159,
+      "intercept": -0.0219
     },
     {
       "model": "llama3.2:3b",
       "run": 3,
-      "slope": -0.0004,
-      "intercept": 0.8382
+      "slope": 0.0657,
+      "intercept": -0.6438
     },
     {
       "model": "llama3.1:8b",
       "run": 1,
-      "slope": 0.1864,
-      "intercept": -1.0944
+      "slope": 0.0145,
+      "intercept": -0.0446
     },
     {
       "model": "llama3.1:8b",
       "run": 2,
-      "slope": 0.0329,
-      "intercept": -0.0068
+      "slope": -0.0061,
+      "intercept": 0.0474
     },
     {
       "model": "llama3.1:8b",
       "run": 3,
-      "slope": -0.0236,
-      "intercept": -0.0467
+      "slope": 0.375,
+      "intercept": -0.4375
     },
     {
       "model": "gemma3:12b",
       "run": 1,
-      "slope": -0.1,
-      "intercept": 0.5516
+      "slope": -0.3384,
+      "intercept": 1.1008
     },
     {
       "model": "gemma3:12b",
       "run": 2,
-      "slope": -0.25,
-      "intercept": 0.7353
+      "slope": 1.3047,
+      "intercept": -2.2822
     },
     {
       "model": "gemma3:12b",
       "run": 3,
-      "slope": -0.1996,
-      "intercept": 1.0207
+      "slope": -0.23,
+      "intercept": 0.95
+    },
+    {
+      "model": "phi4-mini",
+      "run": 1,
+      "slope": -0.1452,
+      "intercept": 1.2345
+    },
+    {
+      "model": "phi4-mini",
+      "run": 2,
+      "slope": 9.3941,
+      "intercept": -25.8913
+    },
+    {
+      "model": "phi4-mini",
+      "run": 3,
+      "slope": 3.4174,
+      "intercept": -9.0114
+    },
+    {
+      "model": "qwen3.5:9b",
+      "run": 1,
+      "slope": null,
+      "intercept": null
+    },
+    {
+      "model": "qwen3.5:9b",
+      "run": 2,
+      "slope": null,
+      "intercept": null
+    },
+    {
+      "model": "qwen3.5:9b",
+      "run": 3,
+      "slope": null,
+      "intercept": null
     }
   ],
   "quotes": [
@@ -339,17 +539,17 @@
     },
     {
       "id": "phillips-curve",
-      "model": "llama3.1:8b",
+      "model": "llama3.2:3b",
       "prompt_id": "okun-recall",
-      "caption": "Describes the Phillips curve (unemployment vs inflation), not Okun's Law.",
+      "caption": "Mixes up Okun's Law with the Phillips curve: it relates unemployment to inflation, not output.",
       "excerpts": [
         {
           "runs": [
-            2
+            3
           ],
           "grade": "fail",
           "failure_mode": "wrong_concept",
-          "text": "Okun's Law states that a decrease in unemployment is associated with an increase in inflation, and vice versa, due to the trade-off between employment and price stability."
+          "text": "Okun's Law states that the ratio of the unemployment rate to the inflation rate is approximately 1.5 in the United States"
         }
       ]
     },
@@ -357,23 +557,23 @@
       "id": "invented-1950s",
       "model": "llama3.2:3b",
       "prompt_id": "okun-trap",
-      "caption": "The data starts in 1960. Instead of saying so, it invents values for the 1950s.",
+      "caption": "The data starts in 1960. Instead of saying so, it relabels the 1960s rows as the 1950s.",
       "excerpts": [
         {
           "runs": [
-            3
+            2
           ],
           "grade": "fail",
           "failure_mode": "hallucination",
-          "text": "Looking at the data, we see that the unemp_change for 1950 is not available. However, we can calculate it as follows: "
+          "text": "First, let's filter the data to only include the values from 1950-1959:"
         },
         {
           "runs": [
-            3
+            2
           ],
           "grade": "fail",
           "failure_mode": "hallucination",
-          "text": "unemp_change_1949 = 0.7833\nunemp_change_1951 = 2.8333"
+          "text": "1950,2.5745,0.0917\n1951,2.5653,1.15\n1952,6.1296,-1.125"
         }
       ]
     },
@@ -381,24 +581,23 @@
       "id": "made-up-date",
       "model": "gemma3:12b",
       "prompt_id": "trap-01",
-      "caption": "A passing answer that still states a made-up date as fact, and a different one on run 3.",
+      "caption": "Passing answers that still state a made-up date as today's, and not the same one each run.",
       "excerpts": [
         {
           "runs": [
-            1,
-            2
-          ],
-          "grade": "pass",
-          "failure_mode": null,
-          "text": "**No one has ever walked on Mars.** As of today (October 26, 2023),"
-        },
-        {
-          "runs": [
-            3
+            1
           ],
           "grade": "pass",
           "failure_mode": null,
           "text": "As of today, June 6, 2024, all missions to Mars have been robotic."
+        },
+        {
+          "runs": [
+            2
+          ],
+          "grade": "pass",
+          "failure_mode": null,
+          "text": "As of today, October 26, 2023, all missions to Mars have been robotic."
         }
       ]
     }

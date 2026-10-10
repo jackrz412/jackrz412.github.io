@@ -8,6 +8,7 @@
 
   /* ---- Type scale: base 17px, ratio ~1.25 ---- */
   --text-sm:   0.8125rem;  /* 13px: captions, chart labels, source notes */
+  --text-md:   0.9375rem;  /* 15px: secondary text that needs to read easily, e.g. quote explanations */
   --text-base: 1.0625rem;  /* 17px: body; Plex Sans runs wide, so 17 reads like 18 */
   --text-lg:   1.3125rem;  /* 21px: lead paragraph / takeaway sentence */
   --text-xl:   1.625rem;   /* 26px: section headings (the findings) */
@@ -30,10 +31,28 @@
   /* ---- Color: accent ---- */
   --color-accent: #1F4E79;  /* navy: links, toggle, focus outline, 8.2:1 */
 
+  /* ---- Color: grades (always shown with the word pass/fail, never color alone) ---- */
+  --grade-pass: #1B6E2A;  /* leaf green, 5.6:1 on surface; yellower than --model-llama3 */
+  --grade-fail: #B3261E;  /* crimson, 5.7:1 on surface; deeper than --model-llama8 */
+
+  /* ---- Color: time split chart (two parts of an answer's time, not models) ---- */
+  --time-before:  #2F6DB0;  /* blue: before the answer starts (reading the prompt, thinking) */
+  --time-writing: #C58B3A;  /* ochre: writing the answer; 2.8:1, so every bar is labeled */
+
   /* ---- Color: models (same everywhere; colorblind-safe) ---- */
   --model-gemma:  #0072B2;  /* gemma3:12b, blue, 4.9:1 */
   --model-llama8: #D55E00;  /* llama3.1:8b, vermillion, 3.6:1 */
   --model-llama3: #008566;  /* llama3.2:3b, bluish green, 4.4:1 */
+  --model-phi4:   #CC79A7;  /* phi4-mini, reddish purple, 2.9:1 (every mark is labeled) */
+  --model-qwen:   #5E3C99;  /* qwen3.5:9b, violet, 8.1:1 */
+
+  /* Model names in running text: the model's hue, darkened until it reads at 5:1 or more
+     on a light tint of the same hue (14% model color over paper). */
+  --model-llama3-text: #006C53;  --model-llama3-tint: #D7E8DF;
+  --model-llama8-text: #9E4600;  --model-llama8-tint: #F5E2D1;
+  --model-gemma-text:  #006299;  --model-gemma-tint:  #D7E5EA;
+  --model-phi4-text:   #87506E;  --model-phi4-tint:   #F4E6E8;
+  --model-qwen-text:   #5E3C99;  --model-qwen-tint:   #E4DEE6;
 
   /* ---- Spacing scale ---- */
   --space-1: 4px;
@@ -48,4 +67,9 @@
   --content-width: 42rem;  /* ~672px ≈ 70 characters of body text */
   --wide-width:    56rem;  /* charts can break out a bit wider than text */
   --radius:        6px;    /* soft corners on cards and the toggle */
+
+  /* ---- Motion: only inside @media (prefers-reduced-motion: no-preference) ---- */
+  --duration-fast: 150ms;   /* hovers, small state changes */
+  --duration-slow: 400ms;   /* chart draw-in, larger transitions */
+  --ease: cubic-bezier(0.2, 0, 0, 1);  /* fast start, gentle stop */
 }

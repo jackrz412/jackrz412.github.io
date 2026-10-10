@@ -1,0 +1,32 @@
+---
+// A navy block cursor to place right after a page title (inside the h1). It blinks hard on/off
+// about 5 times, then stays solid. Decorative, so screen readers skip it.
+---
+
+<span class="cursor" aria-hidden="true"></span>
+
+<style>
+  /* Sized in em so it scales with the heading it sits in. */
+  .cursor {
+    display: inline-block;
+    width: 0.45em;
+    height: 0.8em;
+    margin-left: 0.1em;
+    vertical-align: -0.05em;
+    background: var(--color-accent);
+  }
+
+  /* Without a reduced-motion request: 5 hard blinks of 1s each. After the last one the
+     animation ends and the block goes back to its normal, solid state. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cursor {
+      animation: blink 1s steps(1) 5;
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>

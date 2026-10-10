@@ -1,12 +1,12 @@
 ---
-// Color key for the three models; colors come from the --model-* tokens.
+// Color key for the benchmarked models; colors come from the --model-* tokens.
 import summary from '../data/llm-lab/summary.json';
 ---
 
 <ul class="model-key">
   {summary.models.map((m) => (
-    <li>
-      <span class="swatch" data-model={m.name}></span>
+    <li data-model={m.name}>
+      <span class="swatch"></span>
       <code>{m.name}</code> ({m.size_gb.toFixed(1)} GB)
     </li>
   ))}
@@ -36,15 +36,23 @@ import summary from '../data/llm-lab/summary.json';
     border-radius: 50%;
   }
 
-  .swatch[data-model='llama3.2:3b'] {
+  [data-model='llama3.2:3b'] .swatch {
     background: var(--model-llama3);
   }
 
-  .swatch[data-model='llama3.1:8b'] {
+  [data-model='llama3.1:8b'] .swatch {
     background: var(--model-llama8);
   }
 
-  .swatch[data-model='gemma3:12b'] {
+  [data-model='gemma3:12b'] .swatch {
     background: var(--model-gemma);
+  }
+
+  [data-model='phi4-mini'] .swatch {
+    background: var(--model-phi4);
+  }
+
+  [data-model='qwen3.5:9b'] .swatch {
+    background: var(--model-qwen);
   }
 </style>
