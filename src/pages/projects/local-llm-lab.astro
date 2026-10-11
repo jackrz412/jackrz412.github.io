@@ -235,8 +235,8 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
   </section>
 
   <!-- Method & limitations -->
-  <details>
-    <summary>Method &amp; limitations</summary>
+  <section id="method">
+    <h2>Method &amp; limitations</h2>
     <h3>Method</h3>
     <ul>
       <li>
@@ -304,7 +304,7 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
         })}
       </tbody>
     </table>
-  </details>
+  </section>
 
   <!-- Links -->
   <section id="links">
@@ -462,10 +462,12 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
     gap: var(--space-4);
   }
 
-  /* Major-section gap after each numbered finding, so the next section starts clearly apart. */
+  /* Major-section gap after each results section, so the next one starts clearly apart. */
   #accuracy-vs-time,
   #scorecard,
-  #failure-modes {
+  #failure-modes,
+  #under-the-hood,
+  #method {
     margin-bottom: var(--space-7);
   }
 
@@ -641,9 +643,9 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
     };
     const tip = { format: { x1: false, x2: false, y: false, fill: false } };
     // Draw-in at each answer's own pace: every bar starts together, and each segment takes its
-    // measured time × timeScale, so the slowest answer (qwen3.5:9b, ~150 s) takes 20 s.
+    // measured time × timeScale, so the slowest answer (qwen3.5:9b, ~150 s) takes 6 s.
     // The writing segment starts when the before segment finishes, like the answer itself.
-    const timeScale = 20 / Math.max(...data.map((d) => d.total)); // ≈ 0.134 s per measured second
+    const timeScale = 6 / Math.max(...data.map((d) => d.total)); // ≈ 0.040 s per measured second
     const beforeTiming = (d) => ({ duration: d.before * timeScale, delay: 0 });
     const writingTiming = (d) => ({ duration: d.writing * timeScale, delay: d.before * timeScale });
     container.append(
@@ -835,7 +837,8 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
           }),
           Plot.text([{ sizeGb: 10, tokensPerSecond: bandwidth / 10 }], {
             x: 'sizeGb', y: 'tokensPerSecond', text: () => `${bandwidth} GB/s ÷ size`,
-            dy: -12, textAnchor: 'end', fill: token('--color-muted'),
+            // Below the curve: top of the text 8px under the line's end, where the curve is lowest.
+            lineAnchor: 'top', dy: 8, textAnchor: 'end', fill: token('--color-muted'),
           }),
           modelDots(data, 'sizeGb', 'tokensPerSecond', { 'GB/s used': 'usedGbPerSecond' }),
           modelLabels(data, 'sizeGb', 'tokensPerSecond'),

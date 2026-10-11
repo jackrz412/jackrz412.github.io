@@ -126,7 +126,7 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 - All animation sits inside `@media (prefers-reduced-motion: no-preference)`. Every feature has a complete static fallback: with motion off, nothing is missing, only unanimated.
 - Animate only `transform` and `opacity`. Use only the motion tokens for durations and easing (staggers are multiples of `--duration-fast`).
   - One exception: a cell whose data changes in place (the heatmap's JSON toggle) may transition `fill` over `--duration-fast`.
-  - One exception to the tokens: a bar whose length is a time may draw in at that time's pace, linear, scaled so the longest bar takes 20s (the time split chart: `timeScale` ≈ 0.134 s per measured second, every bar starting together).
+  - One exception to the tokens: a bar whose length is a time may draw in at that time's pace, linear, scaled so the longest bar takes 6s (the time split chart: `timeScale` ≈ 0.040 s per measured second, every bar starting together).
 - Nothing loops except the title cursor. Scroll-triggered effects run once per page load.
 - Banned: fade-in-everything on scroll, parallax, scroll-jacking (taking over the scroll position or speed).
 
