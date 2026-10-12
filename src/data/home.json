@@ -1,0 +1,12 @@
+{
+  "name": "Jack Roberts",
+  "tagline": "Cleared data and program analyst turned AI builder, looking for applied AI roles and taco spots in DC.",
+  "bio": "I'm Jack, a cleared analyst in DC. I have experience building automations, data pipelines, statistical insights, cloud working environments, and graphical deliverables, and am currently fostering those skills in my day job. I'm an economics grad with program concentrations in econometrics, and like bringing that systems-level perspective to solving federal program challenges. I built this site as an enduring passion project, and to be a sandbox for learning new software skills, investigating questions with data, and building fun stuff. When not staring at a screen I can be found noodling on guitar, tinkering with valve amps, or working on my salmon maki. Now and always from Pittsburgh, PA.",
+  "contactLine": "Want to talk data, AI, or tacos? Reach me here.",
+  "contact": {
+    "email": "TODO",
+    "linkedin": "TODO",
+    "github": "https://github.com/jackrz412",
+    "resume": "/resume.pdf"
+  }
+}

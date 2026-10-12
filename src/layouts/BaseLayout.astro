@@ -5,6 +5,8 @@ import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/600.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '../styles/global.css';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 
 interface Props {
   title: string;
@@ -25,9 +27,11 @@ const { title, description } = Astro.props;
   <body>
     <!-- Reading progress: a line across the top that fills as the page scrolls. -->
     <div class="progress" aria-hidden="true"></div>
+    <SiteHeader />
     <main>
       <slot />
     </main>
+    <SiteFooter />
   </body>
 </html>
 

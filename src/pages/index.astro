@@ -1,23 +1,75 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BlinkCursor from '../components/BlinkCursor.astro';
+import ContactLinks from '../components/ContactLinks.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+// The site's words (name, tagline, bio, contact links), kept apart from the layout.
+import home from '../data/home.json';
+
+// Every project in src/content/projects/, split by status. ProjectGrid sorts each list.
+const projects = await getCollection('projects');
+const live = projects.filter((p) => p.data.status === 'live');
+const inProgress = projects.filter((p) => p.data.status === 'in-progress');
 ---
 
 <BaseLayout
-  title="Jack Roberts"
+  title={home.name}
   description="Data analysis and AI engineering projects by Jack Roberts."
 >
-  <header>
-    <h1>Jack Roberts</h1>
-    <p>Data analysis and AI engineering projects.</p>
-  </header>
+  <!-- Hero: name, then the tagline as the lead line. The bio is on the About page. -->
+  <section class="hero" aria-labelledby="hero-title">
+    <h1 id="hero-title">{home.name}<BlinkCursor /></h1>
+    <p class="lead">{home.tagline}</p>
+  </section>
 
-  <section>
-    <h2>Projects</h2>
-    <ul>
-      <li>
-        <a href="/projects/local-llm-lab/">Local LLMs and the Humble Mac mini</a>: five open-weight
-        models benchmarked on a 16 GB Mac mini for accuracy, speed, and why their answers failed.
-      </li>
-    </ul>
+  {live.length > 0 && (
+    <section id="projects">
+      <h2 class="ruled">Projects</h2>
+      <ProjectGrid projects={live} label="Projects" />
+    </section>
+  )}
+
+  {inProgress.length > 0 && (
+    <section id="in-progress">
+      <h2 class="ruled">In progress</h2>
+      <ProjectGrid projects={inProgress} label="Projects in progress" />
+    </section>
+  )}
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>{home.contactLine}</p>
+    <ContactLinks />
   </section>
 </BaseLayout>
+
+<style>
+  /* Major-section gap above each section after the hero (which sits at the top, with no gap). */
+  section:not(.hero) {
+    margin-top: var(--space-7);
+  }
+
+  /* The tagline: larger than body text, the first thing to read after the name. */
+  .lead {
+    margin: 0;
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+
+  /* A thin line runs from the end of the heading to the right edge of the window.
+     The negative right margin stretches the heading from the column's edge out to the window's
+     (the column is centered, so that gap is half of what the window has beyond the column). */
+  .ruled {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-right: calc(50% - 50vw);
+  }
+
+  .ruled::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--color-border);
+  }
+</style>

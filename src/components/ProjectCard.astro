@@ -1,0 +1,119 @@
+---
+// One project as a card: art area (16:9), title, summary, and a mono meta line "tools · Mon YYYY".
+// A live card is one link: the title's link stretches over the whole card, so anywhere is
+// clickable but screen readers hear just the title. In-progress cards have no link, a dashed
+// border, and a faded art area.
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>['data'];
+}
+
+const { project } = Astro.props;
+const { title, summary, status, date, tools, href } = project;
+const isLink = status === 'live' && href;
+// Links that leave the site get an arrow, so visitors know they're going to GitHub.
+const isExternal = isLink && /^https?:/.test(href);
+
+// Dates are written YYYY-MM-DD and stored as midnight UTC; format in UTC too, or a US time zone
+// would show the day before (and on the 1st, the month before).
+const month = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
+---
+
+<article class:list={['card', status]}>
+  <div class="art" aria-hidden="true"></div>
+  <h3>
+    {isLink ? (
+      <a href={href}>{title}{isExternal && <span class="external" aria-hidden="true"> ↗</span>}</a>
+    ) : (
+      title
+    )}
+  </h3>
+  <p class="summary">{summary}</p>
+  <p class="meta">{meta}</p>
+</article>
+
+<style>
+  .card {
+    position: relative; /* the anchor for the stretched link */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  /* Placeholder art until each project's custom art is built. */
+  .art {
+    aspect-ratio: 16 / 9; /* wide and short, so cards read wide rather than tall */
+    margin-bottom: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-base);
+  }
+
+  /* The title link covers the whole card through this invisible layer. */
+  h3 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .external {
+    color: var(--color-muted);
+  }
+
+  .summary {
+    flex: 1; /* pushes the meta line to the bottom, so meta lines align across a row */
+    margin: 0 0 var(--space-3);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  .meta {
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  /* Live cards: hover and keyboard focus mark the whole card, not just the title. */
+  .card.live:hover {
+    border-color: var(--color-accent);
+  }
+
+  .card.live:hover h3 a {
+    text-decoration: underline;
+  }
+
+  .card:has(a:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .card a:focus-visible {
+    outline: none; /* the card's outline replaces the title's */
+  }
+
+  /* In progress: dashed edge and a faded art area, so it reads as not ready yet. */
+  .card.in-progress {
+    border-style: dashed;
+  }
+
+  .card.in-progress .art {
+    opacity: 0.5;
+  }
+</style>

@@ -64,8 +64,8 @@
   --space-7: 64px;   /* between major sections */
 
   /* ---- Layout ---- */
-  --content-width: 42rem;  /* ~672px ≈ 70 characters of body text */
-  --wide-width:    56rem;  /* charts can break out a bit wider than text */
+  --content-width: 46rem;  /* ~736px ≈ 77 characters of body text, near the comfortable limit */
+  --wide-width:    64rem;  /* content that breaks out wider than the text column (unused for now) */
   --radius:        6px;    /* soft corners on cards and the toggle */
 
   /* ---- Motion: only inside @media (prefers-reduced-motion: no-preference) ---- */

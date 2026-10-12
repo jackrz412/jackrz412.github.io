@@ -1,0 +1,50 @@
+---
+// Contact links from home.json: Email, LinkedIn, GitHub, Resume. A link still set to "TODO" is
+// left out; the resume shows only once public/resume.pdf (or whatever path is set) exists.
+// The email is never written out in the page: the build stores its two halves reversed, and
+// a script puts the mailto link together in the visitor's browser.
+import fs from 'node:fs';
+import path from 'node:path';
+import home from '../data/home.json';
+
+const { email, linkedin, github, resume } = home.contact;
+const isSet = (value: string) => Boolean(value) && value !== 'TODO';
+
+// Checked at build time, from the project folder (where npm run build runs).
+const hasResume = isSet(resume) && fs.existsSync(path.join(process.cwd(), 'public', resume));
+
+const reverse = (text: string) => [...text].reverse().join('');
+const [emailUser, emailDomain] = isSet(email) ? email.split('@') : [];
+---
+
+<ul class="contact-links">
+  {emailUser && emailDomain && (
+    // Hidden until the script builds the address; without JavaScript there's no email link.
+    <li hidden>
+      <a class="email" href="#contact" data-u={reverse(emailUser)} data-d={reverse(emailDomain)}>Email</a>
+    </li>
+  )}
+  {isSet(linkedin) && <li><a href={linkedin}>LinkedIn</a></li>}
+  {isSet(github) && <li><a href={github}>GitHub</a></li>}
+  {hasResume && <li><a href={resume}>Resume (PDF)</a></li>}
+</ul>
+
+<script>
+  // Put the email back together from its reversed halves and show the link.
+  const reverse = (text: string) => [...text].reverse().join('');
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('.contact-links .email')) {
+    link.href = `mailto:${reverse(link.dataset.u ?? '')}@${reverse(link.dataset.d ?? '')}`;
+    link.closest('li')?.removeAttribute('hidden');
+  }
+</script>
+
+<style>
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -10,6 +10,8 @@ body {
   font-size: var(--text-base);
   font-weight: var(--weight-regular);
   line-height: var(--leading-body);
+  /* Full-window lines (100vw) count the scrollbar too; clip the overshoot so the page never scrolls sideways. */
+  overflow-x: clip;
 }
 
 /* Centered content column; the side padding keeps text off the screen edge on phones. */

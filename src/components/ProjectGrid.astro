@@ -1,0 +1,68 @@
+---
+// A set of project cards. Wide screens: a wrapping grid in the text column, 3 columns at most,
+// so the cards line up with the headings. Narrow screens: a horizontal row you swipe through, snapping to
+// each card, with the next card peeking in at the edge. The row is a labeled region that
+// keyboard users can focus and scroll with arrows.
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+  label: string; // names the region for screen readers, e.g. "Projects"
+}
+
+const { projects, label } = Astro.props;
+
+// Projects with an `order` come first, lowest first; the rest follow, newest first.
+const sorted = [...projects].sort((a, b) => {
+  const orderA = a.data.order ?? Infinity;
+  const orderB = b.data.order ?? Infinity;
+  if (orderA !== orderB) return orderA - orderB;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
+---
+
+<div class="project-grid" role="region" aria-label={label} tabindex="0">
+  <ul>
+    {sorted.map((p) => (
+      <li>
+        <ProjectCard project={p.data} />
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  ul {
+    display: grid;
+    /* Each column is at least 11rem, and at least a third of the row (so never more than 3). */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(max(11rem, calc((100% - 2 * var(--space-4)) / 3)), 1fr)
+    );
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Narrow screens: one row that scrolls sideways. Each card is 80% of the width, so the next
+     one shows at the edge as a hint to swipe; scroll-snap stops each swipe on a card. */
+  @media (max-width: 40rem) {
+    .project-grid {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: var(--space-2); /* room for the scrollbar where one shows */
+    }
+
+    ul {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    li {
+      flex: 0 0 80%;
+      scroll-snap-align: start;
+    }
+  }
+</style>

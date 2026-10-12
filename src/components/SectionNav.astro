@@ -50,13 +50,14 @@
 </script>
 
 <style>
-  /* Only where the margin beside the 42rem column fits a 13rem list: 42 + 2 × (13 + 2) = 72rem.
+  /* Only where the margin beside the 46rem column fits a 13rem list: 46 + 2 × (13 + 2) = 76rem.
+     If --content-width changes, change this width too.
      Media queries can't read custom properties, so the width is written out. */
   .section-nav {
     display: none;
   }
 
-  @media (min-width: 72rem) {
+  @media (min-width: 76rem) {
     .section-nav:not([hidden]) {
       display: block;
       position: fixed;
