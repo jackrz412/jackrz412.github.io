@@ -1,7 +1,11 @@
 ---
 // Project page for the housing risk map. The map itself is a separate repo (us-housing-map),
 // published on this same domain at /us-housing-map/; this page introduces it and links to it.
+// Copy: content/housing-page-content.md (final text). Figures are placeholders for now; the real
+// ones come in a later PR. Every number in the copy was checked against the us-housing-map repo
+// (BACKTEST.md, reports/backtest/secondary.json, reports/regions/).
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlinkCursor from '../../components/BlinkCursor.astro';
 import SectionNav from '../../components/SectionNav.astro';
 
 // Site paths, so the links stay on this domain (they work on the live site only, not in
@@ -12,24 +16,239 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
 ---
 
 <BaseLayout
-  title="Housing risk map | Jack Roberts"
-  description="A county-by-county map of US mortgage stress, built from public CFPB, Census and HMDA data."
+  title="Where mortgage stress is building | Jack Roberts"
+  description="An interactive county map of US housing burden, and an honest test of whether it predicts default."
 >
   <p><a href="/">← Home</a></p>
   <SectionNav />
 
-  <!-- Headline + summary -->
+  <!-- Headline, subtitle, links + summary -->
   <header>
-    <h1>Housing risk map</h1>
+    <p class="eyebrow kicker">Housing risk map</p>
+    <h1>Where mortgage stress is building<BlinkCursor /></h1>
+    <p class="subtitle">
+      An interactive county map of US housing burden, and an honest test of whether it predicts default.
+    </p>
+    <ul class="links-row" aria-label="Project links">
+      <li><a href={mapUrl}>Explore the live map</a></li>
+      <li><a href={methodologyUrl}>Methodology</a></li>
+      <li><a href={repoUrl}>GitHub repo</a></li>
+    </ul>
     <hr class="results-rule under-title" />
     <p class="eyebrow under-title">Summary up front</p>
-    <!-- Summary goes here. -->
+    <ul>
+      <li>
+        I built an interactive map of every US county, joining Census, CFPB, mortgage-loan and
+        Treasury insurance data into measures of how stretched homeowners are.
+      </li>
+      <li>
+        Households on the Pacific coast carry the heaviest payment burden in the country; much of
+        the interior buys with the thinnest equity.
+      </li>
+      <li>
+        I tested whether my burden index predicted later delinquency. It didn't, but thin equity
+        did, and that points to the next version.
+      </li>
+    </ul>
   </header>
 
-  <!-- Page content goes here: one <section id="…"> with an <h2> per part, so the section nav
-       lists it. -->
+  <!-- Hero figure (placeholder until the figures PR). The real one links to the live map. -->
+  <figure class="hero">
+    <a class="placeholder" href={mapUrl}>
+      Burden score by county. 1.0 is the 2019 national benchmark.
+    </a>
+  </figure>
 
-  <!-- Links -->
+  <!-- Intro (no heading) -->
+  <p>
+    It's impossible to under-stress the importance of housing. Like food and water, shelter is what
+    lets us stop fighting for survival and start building a life. It's also the largest expense
+    most of us will ever take on: housing dictates budgets, where we live, and which jobs we can
+    accept. And because homes secure the biggest form of household debt, the mortgage, what happens
+    in housing doesn't stay in housing. It reaches banks, retirement accounts and the wider economy,
+    as 2008 made clear.
+  </p>
+  <p>
+    Affordability has fallen sharply since 2019. I wanted to look past the national headlines and
+    ask a more personal question: what does a home cost relative to the lives of the people paying
+    for it right now? How are mortgage payments fitting into tightening budgets, and how different
+    does that look from one county to the next? Are the strains on household finances starting to
+    show in the way we buy and pay for homes?
+  </p>
+  <p>
+    Numbers, while precise, are the wrong medium for showing stress across 3,000 places at once.
+    Answering these questions was a chance to expand on something I love: visual learning and
+    graphics.
+  </p>
+
+  <section id="what-the-map-shows">
+    <h2>What the map shows</h2>
+    <p>
+      Both coasts are famous for high housing costs and high-paying jobs, but they don't carry the
+      same kind of stress. On the Pacific coast, the strain is the monthly payment: 37% of mortgaged
+      owners in California, Oregon and Washington spend 30% or more of their income on housing,
+      compared with 28% in the Northeast, and Los Angeles reaches 43%. I expected that pattern to
+      stretch inland from Colorado, but it doesn't. The Mountain states, Denver included, look much
+      like the East Coast.
+    </p>
+    <p>
+      The East has its own pressures. New York City carries the heaviest owner cost burden of any
+      major metro I looked at (46%), and the Northeast pays a larger share of income in property
+      taxes than any other region. Move away from the coasts and a different risk takes over: thin
+      equity. In the Midwest, 39% of 2025 conventional purchase loans left the buyer with less than
+      10% equity. On the Pacific coast, only 15% did.
+    </p>
+    <figure>
+      <div class="placeholder">Different regions are stretched in different ways.</div>
+    </figure>
+    <p>
+      Seeing well-known cost-of-living patterns show up in the data was a useful first check that
+      these measures capture something real. The more interesting result is that different regions
+      are stretched in different ways, and, as the next section shows, those differences matter.
+    </p>
+  </section>
+
+  <section id="what-i-built">
+    <h2>What I built</h2>
+    <p>
+      An interactive map of every US county, with data layers grouped by the role each plays in
+      mortgage risk:
+    </p>
+    <ul>
+      <li>
+        <strong>Burden:</strong> how much of household income goes to housing, both for existing
+        owners and for people who bought in 2025.
+      </li>
+      <li><strong>Equity:</strong> how many new loans leave buyers with less than 10% equity.</li>
+      <li>
+        <strong>Outcome:</strong> where serious mortgage delinquency sits compared with each
+        county's own 2017–2019 normal.
+      </li>
+      <li>
+        <strong>Index:</strong> two scores, burden and equity, that combine those measures against
+        fixed 2019 benchmarks.
+      </li>
+    </ul>
+    <p>Selecting a county shows every measure side by side, so you can see what's driving its numbers.</p>
+    <p>
+      Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB delinquency
+      data, 2025 mortgage loan records, Treasury insurance premiums), cleans and validates it, and
+      writes small data files the page loads directly. A scheduled job reruns the pipeline weekly and
+      republishes only when the source data changes. The map itself is built with D3.
+    </p>
+    <p class="stack">Python · DuckDB · D3 · TopoJSON · GitHub Actions · GitHub Pages</p>
+  </section>
+
+  <section id="decisions">
+    <h2>Decisions that shaped it</h2>
+    <ul>
+      <li>
+        <strong>Missing data stays missing.</strong> Counties without reliable data are hatched and
+        labeled, not estimated.
+      </li>
+      <li>
+        <strong>Colors mean something.</strong> Shading is tied to real benchmarks, like the
+        standard that housing should take no more than 30% of income, rather than to rankings. A
+        dark county is over a line, not just in the top seventh.
+      </li>
+      <li>
+        <strong>Payments are calculated loan by loan.</strong> The new-buyer burden comes from each
+        loan's actual amount, rate, term, taxes and insurance, divided by that borrower's income.
+      </li>
+    </ul>
+  </section>
+
+  <section id="testing-the-index">
+    <h2>Testing the index</h2>
+    <p>
+      The index is built on the "double trigger" theory of default: households usually default when
+      they're stretched <em>and</em> hit by a shock, like a job loss. Before looking at any results,
+      I wrote down a test: would counties with higher burden in 2019 see delinquency rise by
+      2023–2025?
+    </p>
+    <p>
+      They didn't. Higher-burden counties actually saw delinquency fall slightly more (rank
+      correlation −0.16, across 499 counties). The diagnosis: delinquency fell almost everywhere in
+      that period, so the test mostly measured how far each county had to fall. And 2019–2025 never
+      delivered the second trigger. Unemployment stayed low, forbearance carried borrowers through
+      2020, and rising home prices gave owners an equity cushion.
+    </p>
+    <p>
+      Because that first test mostly measured where each county started, I added one more test,
+      specified before running it: compare counties that began at the same delinquency level. The
+      combined burden score still showed nothing. But its parts split in two. Thin equity was the
+      strongest signal of any measure, followed by lower incomes and the share of applicants denied
+      for carrying too much debt. The housing-cost measures, payment-to-income and the share of
+      owners paying 30% or more, pointed the opposite way and canceled the others out.
+    </p>
+    <figure>
+      <div class="placeholder">
+        Partial rank correlation with 2023–2025 delinquency, controlling for each county's 2017–2019
+        level. Bars are 95% bootstrap intervals.
+      </div>
+    </figure>
+    <p>
+      That fits the double-trigger theory better than my index did: what mattered was whether
+      households had a cushion, not just how large the payment was. The Pacific coast is a good
+      example, with the heaviest payment burden in the country and the least thin-equity lending.
+      But this came from comparing seven measures after the fact, so I'm treating it as a lead for
+      the next version of the index, not a conclusion. Testing that version honestly will take data
+      I haven't seen yet.
+    </p>
+    <p>
+      So the map describes where households are stretched today. It doesn't forecast defaults, and
+      I'd rather say that plainly than tune the index until it appears to.
+    </p>
+  </section>
+
+  <section id="who-could-use-this">
+    <h2>Who could use this</h2>
+    <p>
+      Mortgage brokers and lenders already use area-level data to size markets and focus outreach. A
+      county-level view of burden shows where refinance options, first-time buyer programs and
+      down-payment assistance would meet the most demand. Housing counselors and local governments
+      could use the same view to see where support is likely to be needed before it shows up in
+      delinquency numbers.
+    </p>
+  </section>
+
+  <section id="what-i-learned">
+    <h2>What I learned</h2>
+    <p>
+      On the technical side, this was my deepest dive yet into how web graphics are built. An
+      interactive map turns out to be many small components, each with one job: a projection that
+      places counties on screen, a scale that turns numbers into colors, a data join that matches
+      each county to its values. Each is simple on its own; together they make a working map.
+    </p>
+    <p>
+      The bigger lessons were about data. Quality assurance isn't a final step; it's most of the
+      work. And combining mismatched sources is where the value is. None of these datasets says much
+      on its own: a loan record doesn't know the borrower's taxes, and a Census survey doesn't know
+      today's mortgage rates. Joined county by county, they describe something none of them could
+      alone.
+    </p>
+  </section>
+
+  <section id="how-i-built-it">
+    <h2>How I built it</h2>
+    <p>
+      Like every project on this site, this one runs on a learning structure I set up deliberately.
+      I use Claude Code for bulk programming, so the work moves quickly, while I own the spec, review
+      every change, and make each design decision. Some things I keep for myself on purpose, like
+      all git and version-control work, so I'm building real skills rather than just shipping output.
+    </p>
+  </section>
+
+  <section id="whats-next">
+    <h2>What's next</h2>
+    <p>
+      Shock scenarios: sliders for income, insurance, taxes and rates that show how many counties
+      would cross the burden line under each. After that, an AI layer: an MCP server that lets AI
+      tools query any county's data and answer questions about it.
+    </p>
+  </section>
+
+  <!-- Links (the copy's repeated links row) -->
   <section id="links">
     <h2>Map, code and data</h2>
     <ul>
@@ -63,5 +282,69 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
 
   .eyebrow.under-title {
     margin-bottom: var(--space-3);
+  }
+
+  /* The project name above the title, in the eyebrow style. */
+  .eyebrow.kicker {
+    margin-bottom: var(--space-2);
+  }
+
+  .subtitle {
+    margin: 0 0 var(--space-3);
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+
+  /* Compact links under the subtitle, separated by middle dots. */
+  .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .links-row li + li::before {
+    content: '·';
+    margin-right: var(--space-3);
+    color: var(--color-muted);
+  }
+
+  /* The tools behind the map: small, muted, mono. */
+  .stack {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  figure {
+    margin: var(--space-5) 0;
+  }
+
+  .hero {
+    margin-top: var(--space-6);
+  }
+
+  /* Figure placeholders until the figures PR: final size, the caption text inside. */
+  .placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  .hero .placeholder {
+    aspect-ratio: 16 / 10;
+    text-decoration: none;
   }
 </style>
