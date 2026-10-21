@@ -33,6 +33,7 @@ Contrast ratios are measured against `--color-bg` unless noted.
 | --- | --- | --- |
 | `--grade-pass` / `--grade-fail` | The words "pass" / "fail". Always the word, never color alone | 6.0:1 / 6.2:1 (5.6 / 5.7 on surface) |
 | `--time-before` / `--time-writing` | Time split chart segments (not models) | 5.0:1 / 2.8:1 (so every bar is labeled) |
+| `--chart-payment` / `--chart-equity` | Housing charts: payment burden (rust) vs thin equity (steel blue). Not models | 5.4:1 / 5.4:1 (5.1 / 5.0 on surface); ΔE 74 protan, 85 deutan |
 
 ### Color: models (fixed per model, everywhere)
 
