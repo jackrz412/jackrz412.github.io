@@ -12,7 +12,7 @@ Text in [BRACKETS] is an instruction for the builder, not page content.
 
 **Links row:** [Explore the live map] · [Methodology] · [GitHub repo]
 
-[HERO FIGURE: screenshot of the live map, Burden score layer. Caption: "Burden score by county. 1.0 is the 2019 national benchmark." Links to the live map.]
+[HERO FIGURE: screenshot of the live map, Burden score layer. Caption: "Burden score by county. 1.0 is the benchmark: 2019 national levels, and the 28% rule for payments." Links to the live map.]
 
 ---
 
@@ -20,7 +20,7 @@ Text in [BRACKETS] is an instruction for the builder, not page content.
 
 It's impossible to under-stress the importance of housing. Like food and water, shelter is what lets us stop fighting for survival and start building a life. It's also the largest expense most of us will ever take on: housing dictates budgets, where we live, and which jobs we can accept. And because homes secure the biggest form of household debt, the mortgage, what happens in housing doesn't stay in housing. It reaches banks, retirement accounts and the wider economy, as 2008 made clear.
 
-Affordability has fallen sharply since 2019. I wanted to look past the national headlines and ask a more personal question: what does a home cost relative to the lives of the people paying for it right now? How are mortgage payments fitting into tightening budgets, and how different does that look from one county to the next? Are the strains on household finances starting to show in the way we buy and pay for homes?
+Affordability has fallen sharply since 2019: the share of new home loans with debt payments above 43% of income rose from 29% to 38% by 2025. I wanted to look past the national headlines and ask a more personal question: what does a home cost relative to the lives of the people paying for it right now? How are mortgage payments fitting into tightening budgets, and how different does that look from one county to the next? Are the strains on household finances starting to show in the way we buy and pay for homes?
 
 Numbers, while precise, are the wrong medium for showing stress across 3,000 places at once. Answering these questions was a chance to expand on something I love: visual learning and graphics.
 
@@ -28,9 +28,9 @@ Numbers, while precise, are the wrong medium for showing stress across 3,000 pla
 
 ## What the map shows
 
-Both coasts are famous for high housing costs and high-paying jobs, but they don't carry the same kind of stress. On the Pacific coast, the strain is the monthly payment: 37% of mortgaged owners in California, Oregon and Washington spend 30% or more of their income on housing, compared with 28% in the Northeast, and Los Angeles reaches 43%. I expected that pattern to stretch inland from Colorado, but it doesn't. The Mountain states, Denver included, look much like the East Coast.
+Both coasts are famous for high housing costs and high-paying jobs, but they don't carry the same kind of stress. On the Pacific coast, the strain is the monthly payment: in the typical county in California, Oregon and Washington, 37% of mortgaged owners spend 30% or more of their income on housing, compared with 28% in the Northeast, and Los Angeles reaches 43%. I expected that pattern to stretch inland from Colorado, but it doesn't. The Mountain states, Denver included, look much like the East Coast.
 
-The East has its own pressures. New York City carries the heaviest owner cost burden of any major metro I looked at (46%), and the Northeast pays a larger share of income in property taxes than any other region. Move away from the coasts and a different risk takes over: thin equity. In the Midwest, 39% of 2025 conventional purchase loans left the buyer with less than 10% equity. On the Pacific coast, only 15% did.
+The East has its own pressures. New York City carries the heaviest owner cost burden of any major metro I looked at (46% in the typical borough), and the Northeast pays a larger share of income in property taxes than any other region. Move away from the coasts and a different risk takes over: thin equity. In the typical Midwest county, 39% of 2025 conventional purchase loans left the buyer with less than 10% equity. In the typical Pacific coast county, only 15% did.
 
 [FIGURE 1: regional comparison. For each region (Pacific, Mountain, Northeast, South Atlantic, Midwest), show two values side by side: share of mortgaged owners paying 30%+ of income, and share of 2025 conventional loans above 90% CLTV. Caption: "Different regions are stretched in different ways."]
 
@@ -49,7 +49,7 @@ An interactive map of every US county, with data layers grouped by the role each
 
 Selecting a county shows every measure side by side, so you can see what's driving its numbers.
 
-Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB delinquency data, 2025 mortgage loan records, Treasury insurance premiums), cleans and validates it, and writes small data files the page loads directly. A scheduled job reruns the pipeline weekly and republishes only when the source data changes. The map itself is built with D3.
+Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB delinquency data, 2025 mortgage loan records, Treasury insurance premiums), cleans and validates it, and writes small data files the page loads directly. A scheduled job reruns the pipeline weekly and republishes only when the source data changes; the insurance premiums, a one-time Treasury release, were converted to counties once. The map itself is built with D3.
 
 [STACK LINE, small and muted: Python · DuckDB · D3 · TopoJSON · GitHub Actions · GitHub Pages]
 
@@ -58,8 +58,8 @@ Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB d
 ## Decisions that shaped it
 
 - **Missing data stays missing.** Counties without reliable data are hatched and labeled, not estimated.
-- **Colors mean something.** Shading is tied to real benchmarks, like the standard that housing should take no more than 30% of income, rather than to rankings. A dark county is over a line, not just in the top seventh.
-- **Payments are calculated loan by loan.** The new-buyer burden comes from each loan's actual amount, rate, term, taxes and insurance, divided by that borrower's income.
+- **Colors mean something.** Shading is tied to fixed benchmarks, like the national share of owners paying 30% or more of income on housing, rather than to rankings. A dark county is over a line, not just in the top seventh.
+- **Payments are calculated loan by loan.** The new-buyer burden comes from each loan's actual amount, rate and term, plus county estimates of its property taxes and insurance, divided by that borrower's income.
 
 ---
 
@@ -67,7 +67,7 @@ Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB d
 
 The index is built on the "double trigger" theory of default: households usually default when they're stretched *and* hit by a shock, like a job loss. Before looking at any results, I wrote down a test: would counties with higher burden in 2019 see delinquency rise by 2023–2025?
 
-They didn't. Higher-burden counties actually saw delinquency fall slightly more (rank correlation −0.16, across 499 counties). The diagnosis: delinquency fell almost everywhere in that period, so the test mostly measured how far each county had to fall. And 2019–2025 never delivered the second trigger. Unemployment stayed low, forbearance carried borrowers through 2020, and rising home prices gave owners an equity cushion.
+They didn't. Higher-burden counties actually saw delinquency fall slightly more (rank correlation −0.16, across 499 counties). The diagnosis: delinquency fell almost everywhere in that period, so the test mostly measured how far each county had to fall. And 2019–2025 never delivered a lasting second trigger. The 2020 unemployment spike was brief, forbearance carried borrowers through it, and rising home prices gave owners an equity cushion.
 
 Because that first test mostly measured where each county started, I added one more test, specified before running it: compare counties that began at the same delinquency level. The combined burden score still showed nothing. But its parts split in two. Thin equity was the strongest signal of any measure, followed by lower incomes and the share of applicants denied for carrying too much debt. The housing-cost measures, payment-to-income and the share of owners paying 30% or more, pointed the opposite way and canceled the others out.
 

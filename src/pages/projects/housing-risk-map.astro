@@ -17,7 +17,8 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
 
 <BaseLayout
   title="Where mortgage stress is building | Jack Roberts"
-  description="An interactive county map of US housing burden, and an honest test of whether it predicts default."
+  description="An interactive county map of US housing burden, and an honest test of whether it
+  predicts default."
 >
   <p><a href="/">← Home</a></p>
   <SectionNav />
@@ -27,7 +28,8 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     <p class="eyebrow kicker">Housing risk map</p>
     <h1>Where mortgage stress is building<BlinkCursor /></h1>
     <p class="subtitle">
-      An interactive county map of US housing burden, and an honest test of whether it predicts default.
+      An interactive county map of US housing burden, and an honest test of whether it
+      predicts default.
     </p>
     <ul class="links-row" aria-label="Project links">
       <li><a href={mapUrl}>Explore the live map</a></li>
@@ -55,7 +57,8 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
   <!-- Hero figure (placeholder until the figures PR). The real one links to the live map. -->
   <figure class="hero">
     <a class="placeholder" href={mapUrl}>
-      Burden score by county. 1.0 is the 2019 national benchmark.
+      Burden score by county. 1.0 is the benchmark: 2019 national levels, and the 28% rule for
+      payments.
     </a>
   </figure>
 
@@ -69,7 +72,9 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     as 2008 made clear.
   </p>
   <p>
-    Affordability has fallen sharply since 2019. I wanted to look past the national headlines and
+    Affordability has fallen sharply since 2019: the share of new home loans with debt payments
+    above 43% of income rose from 29% to 38% by 2025. I wanted to look past the national
+    headlines and
     ask a more personal question: what does a home cost relative to the lives of the people paying
     for it right now? How are mortgage payments fitting into tightening budgets, and how different
     does that look from one county to the next? Are the strains on household finances starting to
@@ -85,18 +90,20 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     <h2>What the map shows</h2>
     <p>
       Both coasts are famous for high housing costs and high-paying jobs, but they don't carry the
-      same kind of stress. On the Pacific coast, the strain is the monthly payment: 37% of mortgaged
-      owners in California, Oregon and Washington spend 30% or more of their income on housing,
-      compared with 28% in the Northeast, and Los Angeles reaches 43%. I expected that pattern to
+      same kind of stress. On the Pacific coast, the strain is the monthly payment: in the
+      typical county in California, Oregon and Washington, 37% of mortgaged owners spend 30%
+      or more of their income on housing, compared with 28% in the Northeast, and Los Angeles
+      reaches 43%. I expected that pattern to
       stretch inland from Colorado, but it doesn't. The Mountain states, Denver included, look much
       like the East Coast.
     </p>
     <p>
       The East has its own pressures. New York City carries the heaviest owner cost burden of any
-      major metro I looked at (46%), and the Northeast pays a larger share of income in property
+      major metro I looked at (46% in the typical borough), and the Northeast pays a larger
+      share of income in property
       taxes than any other region. Move away from the coasts and a different risk takes over: thin
-      equity. In the Midwest, 39% of 2025 conventional purchase loans left the buyer with less than
-      10% equity. On the Pacific coast, only 15% did.
+      equity. In the typical Midwest county, 39% of 2025 conventional purchase loans left the
+      buyer with less than 10% equity. In the typical Pacific coast county, only 15% did.
     </p>
     <figure>
       <div class="placeholder">Different regions are stretched in different ways.</div>
@@ -133,8 +140,10 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     <p>
       Behind the map, a Python pipeline downloads federal data (Census surveys, CFPB delinquency
       data, 2025 mortgage loan records, Treasury insurance premiums), cleans and validates it, and
-      writes small data files the page loads directly. A scheduled job reruns the pipeline weekly and
-      republishes only when the source data changes. The map itself is built with D3.
+      writes small data files the page loads directly. A scheduled job reruns the pipeline
+      weekly and republishes only when the source data changes; the insurance premiums, a
+      one-time Treasury release, were converted to counties once. The map itself is built with
+      D3.
     </p>
     <p class="stack">Python · DuckDB · D3 · TopoJSON · GitHub Actions · GitHub Pages</p>
   </section>
@@ -147,13 +156,15 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
         labeled, not estimated.
       </li>
       <li>
-        <strong>Colors mean something.</strong> Shading is tied to real benchmarks, like the
-        standard that housing should take no more than 30% of income, rather than to rankings. A
+        <strong>Colors mean something.</strong> Shading is tied to fixed benchmarks, like
+        the national share of owners paying 30% or more of income on housing, rather than to
+        rankings. A
         dark county is over a line, not just in the top seventh.
       </li>
       <li>
-        <strong>Payments are calculated loan by loan.</strong> The new-buyer burden comes from each
-        loan's actual amount, rate, term, taxes and insurance, divided by that borrower's income.
+        <strong>Payments are calculated loan by loan.</strong> The new-buyer burden comes
+        from each loan's actual amount, rate and term, plus county estimates of its property
+        taxes and insurance, divided by that borrower's income.
       </li>
     </ul>
   </section>
@@ -169,9 +180,10 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     <p>
       They didn't. Higher-burden counties actually saw delinquency fall slightly more (rank
       correlation −0.16, across 499 counties). The diagnosis: delinquency fell almost everywhere in
-      that period, so the test mostly measured how far each county had to fall. And 2019–2025 never
-      delivered the second trigger. Unemployment stayed low, forbearance carried borrowers through
-      2020, and rising home prices gave owners an equity cushion.
+      that period, so the test mostly measured how far each county had to fall. And 2019–2025
+      never delivered a lasting second trigger. The 2020 unemployment spike was brief,
+      forbearance carried borrowers through it, and rising home prices gave owners an equity
+      cushion.
     </p>
     <p>
       Because that first test mostly measured where each county started, I added one more test,
@@ -233,9 +245,11 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     <h2>How I built it</h2>
     <p>
       Like every project on this site, this one runs on a learning structure I set up deliberately.
-      I use Claude Code for bulk programming, so the work moves quickly, while I own the spec, review
+      I use Claude Code for bulk programming, so the work moves quickly, while I own the spec,
+      review
       every change, and make each design decision. Some things I keep for myself on purpose, like
-      all git and version-control work, so I'm building real skills rather than just shipping output.
+      all git and version-control work, so I'm building real skills rather than just shipping
+      output.
     </p>
   </section>
 
