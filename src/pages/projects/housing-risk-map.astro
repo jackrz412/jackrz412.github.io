@@ -1,12 +1,18 @@
 ---
 // Project page for the housing risk map. The map itself is a separate repo (us-housing-map),
 // published on this same domain at /us-housing-map/; this page introduces it and links to it.
-// Copy: content/housing-page-content.md (final text). Figures are placeholders for now; the real
-// ones come in a later PR. Every number in the copy was checked against the us-housing-map repo
-// (BACKTEST.md, reports/backtest/secondary.json, reports/regions/).
+// Copy: content/housing-page-content.md (final text). Every number in the copy was checked against
+// the us-housing-map repo (BACKTEST.md, reports/backtest/secondary.json, reports/regions/).
+// Figures are generated in that repo (pipeline/figures/) from its committed data: two SVGs per
+// chart (wide for the text column, narrow for phones), inlined so their colors and fonts come from
+// tokens.css, and a Playwright screenshot of the live map for the hero.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlinkCursor from '../../components/BlinkCursor.astro';
 import SectionNav from '../../components/SectionNav.astro';
+import regionsWide from '../../assets/housing/regions-wide.svg?raw';
+import regionsNarrow from '../../assets/housing/regions-narrow.svg?raw';
+import secondaryWide from '../../assets/housing/secondary-wide.svg?raw';
+import secondaryNarrow from '../../assets/housing/secondary-narrow.svg?raw';
 
 // Site paths, so the links stay on this domain (they work on the live site only, not in
 // `npm run dev`, because the map is deployed from its own repo).
@@ -54,12 +60,17 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     </ul>
   </header>
 
-  <!-- Hero figure (placeholder until the figures PR). The real one links to the live map. -->
+  <!-- Hero: the live map, Burden score layer (us-housing-map pipeline/figures/hero.py). -->
   <figure class="hero">
-    <a class="placeholder" href={mapUrl}>
-      Burden score by county. 1.0 is the benchmark: 2019 national levels, and the 28% rule for
-      payments.
+    <a href={mapUrl}>
+      <img
+        src="/images/housing/hero-burden.jpg"
+        width="1548"
+        height="1336"
+        alt="County map of the Burden score. Much of the Pacific coast, the Southwest, Texas and the Southeast is shaded above the 2019 benchmark, while much of the Midwest and the Northeast is at or below it."
+      />
     </a>
+    <figcaption>Burden score by county. 1.0 is the benchmark: 2019 national levels, and the 28% rule for payments.</figcaption>
   </figure>
 
   <!-- Intro (no heading) -->
@@ -105,8 +116,13 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
       equity. In the typical Midwest county, 39% of 2025 conventional purchase loans left the
       buyer with less than 10% equity. In the typical Pacific coast county, only 15% did.
     </p>
-    <figure>
-      <div class="placeholder">Different regions are stretched in different ways.</div>
+    <figure class="chart" data-draw>
+      <div class="chart-wide" set:html={regionsWide} />
+      <div class="chart-narrow" set:html={regionsNarrow} />
+      <figcaption>
+        Different regions are stretched in different ways.
+        <span class="source">Weighted medians of county values · ACS 2020–2024, HMDA 2025 · us-housing-map reports/regions/regions.json</span>
+      </figcaption>
     </figure>
     <p>
       Seeing well-known cost-of-living patterns show up in the data was a useful first check that
@@ -193,11 +209,14 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
       for carrying too much debt. The housing-cost measures, payment-to-income and the share of
       owners paying 30% or more, pointed the opposite way and canceled the others out.
     </p>
-    <figure>
-      <div class="placeholder">
+    <figure class="chart" data-draw>
+      <div class="chart-wide" set:html={secondaryWide} />
+      <div class="chart-narrow" set:html={secondaryNarrow} />
+      <figcaption>
         Partial rank correlation with 2023–2025 delinquency, controlling for each county's 2017–2019
         level. Bars are 95% bootstrap intervals.
-      </div>
+        <span class="source">499 counties · 1,000 bootstrap resamples · us-housing-map reports/backtest/secondary.json</span>
+      </figcaption>
     </figure>
     <p>
       That fits the double-trigger theory better than my index did: what mattered was whether
@@ -342,23 +361,107 @@ const repoUrl = 'https://github.com/jackrz412/us-housing-map';
     margin-top: var(--space-6);
   }
 
-  /* Figure placeholders until the figures PR: final size, the caption text inside. */
-  .placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 16 / 9;
-    padding: var(--space-4);
-    background: var(--color-surface);
-    border: 1px dashed var(--color-border);
+  /* Hero: the map screenshot, linked to the live map. */
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    color: var(--color-muted);
-    font-size: var(--text-sm);
-    text-align: center;
   }
 
-  .hero .placeholder {
-    aspect-ratio: 16 / 10;
-    text-decoration: none;
+  figcaption {
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Source line under each chart: small mono muted text naming the data file (DESIGN.md). */
+  .source {
+    display: block;
+    margin-top: var(--space-1);
+    font-family: var(--font-mono);
+  }
+
+  /* Two drawings of each chart: wide for the text column, narrow for phones, so labels stay at
+     --text-sm on both. Only one is displayed (the other is out of the accessibility tree too). */
+  .chart-narrow {
+    display: none;
+  }
+
+  @media (max-width: 40rem) {
+    .chart-wide {
+      display: none;
+    }
+
+    .chart-narrow {
+      display: block;
+    }
+  }
+
+  .chart :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Draw-in (DESIGN.md: chart draw-in): bars grow from the baseline and dots fade and scale in,
+     once, when the chart scrolls into view, staggered one --duration-fast step per row. The script
+     adds .is-pending (marks wait at their start) and removes it when the chart comes into view.
+     With reduced motion or without JavaScript the charts are simply drawn. */
+  @media (prefers-reduced-motion: no-preference) {
+    .chart.is-pending :global(.fig-bar),
+    .chart.is-pending :global(.fig-dot),
+    .chart.is-pending :global(.fig-ci) {
+      animation-play-state: paused;
+    }
+
+    .chart :global(.fig-bar) {
+      transform-box: fill-box;
+      transform-origin: left center;
+      animation: bar-grow var(--duration-slow) var(--ease) both;
+      animation-delay: calc(var(--i) * var(--duration-fast));
+    }
+
+    .chart :global(.fig-dot),
+    .chart :global(.fig-ci) {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dot-in var(--duration-slow) var(--ease) both;
+      animation-delay: calc(var(--i) * var(--duration-fast));
+    }
+  }
+
+  @keyframes bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @keyframes dot-in {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
   }
 </style>
+
+<script>
+  // Start each chart's draw-in the first time it scrolls into view (once per page load).
+  const charts = document.querySelectorAll<HTMLElement>('.chart[data-draw]');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.remove('is-pending');
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.3 },
+  );
+  for (const chart of charts) {
+    chart.classList.add('is-pending');
+    observer.observe(chart);
+  }
+</script>
