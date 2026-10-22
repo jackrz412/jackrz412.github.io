@@ -39,6 +39,11 @@
   --time-before:  #2F6DB0;  /* blue: before the answer starts (reading the prompt, thinking) */
   --time-writing: #C58B3A;  /* ochre: writing the answer; 2.8:1, so every bar is labeled */
 
+  /* ---- Color: housing charts (two measures side by side, not models) ---- */
+  --chart-payment: #A64B16; /* rust: payment burden; 5.4:1 on bg, 5.1:1 on surface */
+  --chart-equity:  #2D6A9F; /* steel blue: thin equity; 5.4:1 on bg, 5.0:1 on surface */
+  /* The pair stays distinct with color vision deficiency: ΔE 74 (protan), 85 (deutan). */
+
   /* ---- Color: models (same everywhere; colorblind-safe) ---- */
   --model-gemma:  #0072B2;  /* gemma3:12b, blue, 4.9:1 */
   --model-llama8: #D55E00;  /* llama3.1:8b, vermillion, 3.6:1 */
