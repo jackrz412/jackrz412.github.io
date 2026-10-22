@@ -4,13 +4,19 @@
 // clickable but screen readers hear just the title. In-progress cards have no link, a dashed
 // border, and a faded art area.
 import type { CollectionEntry } from 'astro:content';
+import CountyGrid from './art/CountyGrid.astro';
+
+// Custom card art, by the `art` key in a project's front matter. A project without one keeps the
+// plain placeholder.
+const ART = { 'county-grid': CountyGrid };
 
 interface Props {
   project: CollectionEntry<'projects'>['data'];
 }
 
 const { project } = Astro.props;
-const { title, summary, status, date, tools, href } = project;
+const { title, summary, status, date, tools, href, art } = project;
+const Art = art ? ART[art as keyof typeof ART] : undefined;
 const isLink = status === 'live' && href;
 // Links that leave the site get an arrow, so visitors know they're going to GitHub.
 const isExternal = isLink && /^https?:/.test(href);
@@ -22,7 +28,7 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
 ---
 
 <article class:list={['card', status]}>
-  <div class="art" aria-hidden="true"></div>
+  <div class:list={['art', Art && 'has-art']} aria-hidden="true">{Art && <Art />}</div>
   <h3>
     {isLink ? (
       <a href={href}>{title}{isExternal && <span class="external" aria-hidden="true"> ↗</span>}</a>
@@ -46,13 +52,17 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
     border-radius: var(--radius);
   }
 
-  /* Placeholder art until each project's custom art is built. */
+  /* The art area: custom art where a project has it, otherwise a plain placeholder. */
   .art {
     aspect-ratio: 16 / 9; /* wide and short, so cards read wide rather than tall */
     margin-bottom: var(--space-3);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
+  }
+
+  .art.has-art {
+    overflow: hidden;
   }
 
   h3 {

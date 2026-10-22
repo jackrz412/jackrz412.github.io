@@ -1,0 +1,88 @@
+---
+// Card art for the housing risk map (first draft): an abstract county grid. Small squares fill a
+// loose map-like outline and are shaded in navy at four strengths, like a choropleth; a few are
+// hatched, like the map's "Data not available" counties. Decorative (the card hides it from
+// screen readers). Colors are tokens; the pattern is computed, not random, so every build is the
+// same.
+
+// 16:9 at 10px squares with a 2px paper gap: 32 x 18 cells in a 384 x 216 viewBox.
+const COLS = 32;
+const ROWS = 18;
+const CELL = 12;
+const SIZE = 10;
+
+// The outline: for each row, the first and last column that's "land", with a one-cell margin all
+// round. Loosely a map silhouette (wide middle, ragged top, a peninsula bottom right), not any
+// real geography.
+const TOP = 1;
+const SPAN: [number, number][] = [
+  [9, 24], [5, 26], [3, 27], [2, 28], [2, 29], [2, 29], [3, 29], [3, 28],
+  [4, 28], [5, 27], [6, 26], [8, 26], [11, 24], [14, 24], [21, 24], [22, 23],
+];
+
+// A smooth field over the grid (two broad waves plus a corner gradient), cut into 4 classes, so
+// neighbors tend to match and the shading reads as regions rather than noise.
+function level(c: number, r: number): number {
+  const v =
+    0.5 +
+    0.28 * Math.sin(c / 4.1 + r / 6.3) +
+    0.18 * Math.cos(r / 2.7 - c / 9.5) +
+    0.22 * ((c / COLS) - (r / ROWS));
+  return Math.max(0, Math.min(3, Math.floor(v * 4)));
+}
+
+// Hatched cells: a deterministic, scattered sprinkle (about 1 in 17 land cells). A multiplicative
+// hash, so they don't line up in diagonals the way a plain (c + r) % n pattern would.
+const hatched = (c: number, r: number) => (((c * 73856093) ^ (r * 19349663)) >>> 0) % 17 === 0;
+
+const OPACITY = [0.14, 0.34, 0.6, 0.88];
+
+const cells: { x: number; y: number; o: number; hatch: boolean }[] = [];
+SPAN.forEach(([from, to], i) => {
+  const r = TOP + i;
+  for (let c = from; c <= to; c++) {
+    cells.push({ x: c * CELL + 1, y: r * CELL + 1, o: OPACITY[level(c, r)], hatch: hatched(c, r) });
+  }
+});
+---
+
+<svg class="county-grid" viewBox={`0 0 ${COLS * CELL} ${ROWS * CELL}`} preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="county-grid-hatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+      <rect width="4" height="4" class="paper" />
+      <rect width="1.2" height="4" class="hatch-line" />
+    </pattern>
+  </defs>
+  {cells.map((cell) =>
+    cell.hatch ? (
+      <rect x={cell.x} y={cell.y} width={SIZE} height={SIZE} rx="1.5" fill="url(#county-grid-hatch)" class="edge" />
+    ) : (
+      <rect x={cell.x} y={cell.y} width={SIZE} height={SIZE} rx="1.5" class="fill" style={`opacity: ${cell.o}`} />
+    ),
+  )}
+</svg>
+
+<style>
+  .county-grid {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .fill {
+    fill: var(--color-accent);
+  }
+
+  .paper {
+    fill: var(--color-surface);
+  }
+
+  .hatch-line {
+    fill: var(--color-muted);
+  }
+
+  .edge {
+    stroke: var(--color-border);
+    stroke-width: 0.5;
+  }
+</style>

@@ -8,4 +8,6 @@ tools: [Python, DuckDB, D3]
 # (us-housing-map) published on this same domain at /us-housing-map/.
 href: /projects/housing-risk-map/
 repo: https://github.com/jackrz412/us-housing-map
+# Card art: src/components/art/CountyGrid.astro (first draft).
+art: county-grid
 ---
