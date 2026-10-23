@@ -4,11 +4,12 @@
 // clickable but screen readers hear just the title. In-progress cards have no link, a dashed
 // border, and a faded art area.
 import type { CollectionEntry } from 'astro:content';
-import CountyGrid from './art/CountyGrid.astro';
+import HouseGrid from './art/HouseGrid.astro';
+import MacMiniOrbit from './art/MacMiniOrbit.astro';
 
 // Custom card art, by the `art` key in a project's front matter. A project without one keeps the
 // plain placeholder.
-const ART = { 'county-grid': CountyGrid };
+const ART = { 'house-grid': HouseGrid, 'mac-mini-orbit': MacMiniOrbit };
 
 interface Props {
   project: CollectionEntry<'projects'>['data'];
@@ -46,6 +47,7 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
     display: flex;
     flex-direction: column;
     height: 100%;
+    box-sizing: border-box; /* the height includes padding and border, or the card overflows its slot */
     padding: var(--space-3);
     background: var(--color-bg);
     border: 1px solid var(--color-border);

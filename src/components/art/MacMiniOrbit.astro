@@ -1,0 +1,146 @@
+---
+// Card art for the LLM lab: a line drawing of the M4 Mac mini in the center, seen from slightly
+// above the front, orbited by the four model families tested. Each badge is in its model's color
+// (the same tokens as every LLM lab chart) and joined to the Mac mini by a thin line. Decorative
+// (the card hides it from screen readers). Colors are tokens.
+
+// 16:9: a 384 x 216 viewBox, centered on (CX, CY).
+const W = 384;
+const H = 216;
+const CX = W / 2;
+const CY = H / 2;
+
+// The Mac mini: a rounded square top, foreshortened to half its depth, on a short front edge.
+const SIDE = 104; // width of the top face
+const DEPTH = SIDE / 2; // its height on screen after foreshortening
+const RADIUS = 14; // corner radius of the square, before foreshortening
+const EDGE = 22; // height of the front edge
+const TOP_Y = CY - EDGE / 2; // center of the top face
+const BOTTOM_Y = TOP_Y + EDGE; // center of the same outline at the base
+
+// The model badges, like small planets: each family on its own oval orbit, at a different
+// distance from the Mac mini. `orbit` is the oval's half-width (its half-height is half that);
+// `angle` is where on it the planet sits, counterclockwise from the right. Llama uses the
+// llama3.1:8b color, the larger of the two Llamas tested.
+const BADGE_R = 28;
+const MODELS = [
+  { name: 'Phi', token: 'phi4', orbit: 90, angle: 12 },
+  { name: 'Qwen', token: 'qwen', orbit: 114, angle: 215 },
+  { name: 'Gemma', token: 'gemma', orbit: 138, angle: 145 },
+  { name: 'Llama', token: 'llama8', orbit: 160, angle: 325 },
+].map((m) => {
+  const a = (m.angle * Math.PI) / 180;
+  return { ...m, x: CX + m.orbit * Math.cos(a), y: CY - (m.orbit / 2) * Math.sin(a) };
+});
+
+// The front ports on the M4 Mac mini: two USB-C slots and a headphone jack, left of center.
+const PORT_Y = TOP_Y + DEPTH / 2 + EDGE / 2;
+---
+
+<svg class="mac-mini-orbit" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+  <!-- The orbits, then a line from each badge to the Mac mini (drawn first, so the Mac mini covers
+       their ends). -->
+  {MODELS.map((m) => <ellipse class="orbit" cx={CX} cy={CY} rx={m.orbit} ry={m.orbit / 2} />)}
+  {MODELS.map((m) => <line class="link" x1={m.x} y1={m.y} x2={CX} y2={CY} />)}
+
+  <!-- The Mac mini: the base outline, the band between it and the top, then the top face. The
+       foreshortening squashes only the shape, not the line width (non-scaling-stroke). -->
+  <g class="mini">
+    <rect
+      class="side"
+      x={-SIDE / 2}
+      y={-SIDE / 2}
+      width={SIDE}
+      height={SIDE}
+      rx={RADIUS}
+      transform={`translate(${CX} ${BOTTOM_Y}) scale(1 0.5)`}
+    />
+    <rect class="side-fill" x={CX - SIDE / 2} y={TOP_Y} width={SIDE} height={EDGE} />
+    <line class="outline" x1={CX - SIDE / 2} y1={TOP_Y} x2={CX - SIDE / 2} y2={BOTTOM_Y} />
+    <line class="outline" x1={CX + SIDE / 2} y1={TOP_Y} x2={CX + SIDE / 2} y2={BOTTOM_Y} />
+    <rect
+      class="top"
+      x={-SIDE / 2}
+      y={-SIDE / 2}
+      width={SIDE}
+      height={SIDE}
+      rx={RADIUS}
+      transform={`translate(${CX} ${TOP_Y}) scale(1 0.5)`}
+    />
+    <rect class="port" x={CX - 30} y={PORT_Y - 2} width="8" height="4" rx="2" />
+    <rect class="port" x={CX - 18} y={PORT_Y - 2} width="8" height="4" rx="2" />
+    <circle class="port" cx={CX - 3} cy={PORT_Y} r="2" />
+  </g>
+
+  <!-- The badges: the model's tint, ringed in its chart color, named in its text color. -->
+  {MODELS.map((m) => (
+    <g class="badge">
+      <circle
+        cx={m.x}
+        cy={m.y}
+        r={BADGE_R}
+        style={`fill: var(--model-${m.token}-tint); stroke: var(--model-${m.token})`}
+      />
+      <text x={m.x} y={m.y} style={`fill: var(--model-${m.token}-text)`}>{m.name}</text>
+    </g>
+  ))}
+</svg>
+
+<style>
+  .mac-mini-orbit {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .orbit {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+
+  .link {
+    stroke: var(--color-muted);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .side,
+  .top {
+    stroke: var(--color-text);
+    stroke-width: 1.25;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .side,
+  .side-fill {
+    fill: var(--color-border);
+  }
+
+  .top {
+    fill: var(--color-bg);
+  }
+
+  .outline {
+    stroke: var(--color-text);
+    stroke-width: 1.25;
+  }
+
+  .port {
+    fill: var(--color-muted);
+  }
+
+  .badge circle {
+    stroke-width: 1.5;
+  }
+
+  .badge text {
+    font-family: var(--font-sans);
+    /* In viewBox units, not --text-sm: the art scales with the card, down to about half size on
+       desktop's three-column grid, so this lands near 7px there and 13px on a phone. */
+    font-size: 14px;
+    font-weight: var(--weight-semibold);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+</style>
