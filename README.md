@@ -1,6 +1,6 @@
 # jackrz412.github.io
 
-Personal portfolio of Jack Roberts, showcasing data analysis and AI engineering projects.
+My personal portfolio, showcasing data analysis and AI engineering projects, along with some other side quests I'd like to share with the world. 
 
 Live site: https://jackrz412.github.io/
 
