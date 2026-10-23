@@ -1,0 +1,139 @@
+---
+// Project page for this portfolio site itself: what it's built with, and (to come) why and how.
+// Header follows the other project pages: kicker, title with the cursor, links row.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlinkCursor from '../../components/BlinkCursor.astro';
+
+const repoUrl = 'https://github.com/jackrz412/jackrz412.github.io';
+
+// The "Built with" box: each group is a label and the tools under it.
+const builtWith = [
+  { label: 'Languages', items: ['HTML', 'CSS', 'TypeScript', 'Markdown', 'JSON'] },
+  { label: 'Framework', items: ['Astro, built to static HTML, CSS and JavaScript'] },
+  { label: 'Libraries', items: ['Observable Plot for charts', 'IBM Plex fonts, self-hosted with Fontsource'] },
+  { label: 'Hosting', items: ['GitHub Pages, deployed by a GitHub Actions workflow'] },
+  { label: 'Tools', items: ['Node.js and npm', 'Git and GitHub', 'Claude Code', 'Playwright (Firefox) for screenshots'] },
+];
+---
+
+<BaseLayout
+  title="My digital portfolio site | Jack Roberts"
+  description="How this portfolio is built: the languages, framework and tools behind it."
+>
+  <p><a href="/">← Home</a></p>
+
+  <!-- Headline and links -->
+  <header>
+    <p class="eyebrow kicker">This site</p>
+    <h1>My digital portfolio site<BlinkCursor /></h1>
+    <ul class="links-row" aria-label="Project links">
+      <li><a href={repoUrl}>GitHub repo</a></li>
+    </ul>
+  </header>
+
+  <!-- What it's built with: a boxed list, grouped by kind. -->
+  <aside class="built-with" aria-labelledby="built-with-title">
+    <h2 id="built-with-title" class="eyebrow">Built with</h2>
+    <dl>
+      {builtWith.map((group) => (
+        <div class="group">
+          <dt>{group.label}</dt>
+          {group.items.map((item) => <dd>{item}</dd>)}
+        </div>
+      ))}
+    </dl>
+  </aside>
+
+  <section id="about-this-site">
+    <h2>About this site</h2>
+    <p>
+      This site started for a practical reason: my growing list of personal projects needed a
+      place to live. I built it myself rather than using a site builder, which let me dig into
+      traditional web development and have some fun with UI and UX design.
+    </p>
+    <p>
+      Owning all of it, from the spec and the design to the code and its upkeep, taught me which
+      public software tools are worth using, and let me build without the limits of federal IT
+      platforms like SharePoint.
+    </p>
+    <p>
+      Like every project here, the point is to understand these methods well enough to use them
+      on my own. Ownership is what makes building fun: when it's my methods and decisions on the
+      screen, I want the result to be the best it can be.
+    </p>
+    <p>
+      As AI gets remarkably good at writing code, I think the ability to actually make creative,
+      attractive and consistent visual work like web pages, not just recognize it, will be what
+      sets a product apart from the average of what AI makes with no human input.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Same header pieces as the other project pages. */
+  .eyebrow {
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow.kicker {
+    margin-bottom: var(--space-2);
+  }
+
+  /* Compact links under the title, separated by middle dots. */
+  .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .links-row li + li::before {
+    content: '·';
+    margin-right: var(--space-3);
+    color: var(--color-muted);
+  }
+
+  /* The "Built with" box: a surface panel, groups in two columns on wide screens, one on phones. */
+  .built-with {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .built-with .eyebrow {
+    margin-bottom: var(--space-3);
+    line-height: var(--leading-tight);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  dt {
+    margin-bottom: var(--space-1);
+    font-weight: var(--weight-semibold);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  section {
+    margin-top: var(--space-7);
+  }
+</style>
