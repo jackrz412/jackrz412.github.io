@@ -1,0 +1,99 @@
+---
+// Card art for the housing risk map: a simple house built from small squares, shaded in navy at
+// four strengths like the map's counties, with a few hatched like its "Data not available"
+// counties. Decorative (the card hides it from screen readers). Colors are tokens; the shading is
+// computed, not random, so every build is the same.
+
+// 16:9 at 10px squares with a 2px paper gap: 32 x 18 cells in a 384 x 216 viewBox.
+const COLS = 32;
+const ROWS = 18;
+const CELL = 12;
+const SIZE = 10;
+
+// The house, one string per row: # is a shaded square, x is a hatched one (like the map's "Data
+// not available" counties), . is paper. Pitched roof with a chimney, eaves that overhang the
+// walls, two windows and a door left as gaps. Edit the picture to change it.
+const HOUSE = [
+  '................................',
+  '...............##..##...........',
+  '..............####.##...........',
+  '.............######x#...........',
+  '............#########...........',
+  '...........##########...........',
+  '..........#####x######..........',
+  '.........##############.........',
+  '........################........',
+  '..........############..........',
+  '..........##..####..##..........',
+  '..........##..####..##..........',
+  '..........#####..#####..........',
+  '..........x####..#####..........',
+  '..........#####..####x..........',
+  '..........#####..#####..........',
+  '..........#####..#####..........',
+  '................................',
+];
+
+// A smooth field over the grid (two broad waves plus a corner gradient), cut into 4 classes, so
+// neighbors tend to match and the shading reads as regions rather than noise.
+function level(c: number, r: number): number {
+  const v =
+    0.5 +
+    0.28 * Math.sin(c / 4.1 + r / 6.3) +
+    0.18 * Math.cos(r / 2.7 - c / 9.5) +
+    0.22 * ((c / COLS) - (r / ROWS));
+  return Math.max(0, Math.min(3, Math.floor(v * 4)));
+}
+
+// Lightest class darker than a map's faintest, so the house's outline stays readable.
+const OPACITY = [0.28, 0.46, 0.66, 0.88];
+
+const cells: { x: number; y: number; o: number; hatch: boolean }[] = [];
+HOUSE.forEach((row, r) => {
+  [...row].forEach((ch, c) => {
+    if (ch === '.') return;
+    cells.push({ x: c * CELL + 1, y: r * CELL + 1, o: OPACITY[level(c, r)], hatch: ch === 'x' });
+  });
+});
+---
+
+<svg class="house-grid" viewBox={`0 0 ${COLS * CELL} ${ROWS * CELL}`} preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="house-grid-hatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+      <rect width="4" height="4" class="paper" />
+      <rect width="1.2" height="4" class="hatch-line" />
+    </pattern>
+  </defs>
+  {cells.map((cell) =>
+    cell.hatch ? (
+      <rect x={cell.x} y={cell.y} width={SIZE} height={SIZE} rx="1.5" fill="url(#house-grid-hatch)" class="edge" />
+    ) : (
+      <rect x={cell.x} y={cell.y} width={SIZE} height={SIZE} rx="1.5" class="fill" style={`opacity: ${cell.o}`} />
+    ),
+  )}
+</svg>
+
+<style>
+  .house-grid {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .fill {
+    fill: var(--color-accent);
+  }
+
+  .paper {
+    fill: var(--color-surface);
+  }
+
+  .hatch-line {
+    fill: var(--color-muted);
+  }
+
+  .edge {
+    stroke: var(--color-border);
+    stroke-width: 0.5;
+  }
+</style>
