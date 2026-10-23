@@ -3,11 +3,15 @@
 // from every <section id> in <main> that has an h2, using the h2's text (or the section's
 // data-nav-label, for a shorter label), and marks the section in view with aria-current.
 // Hidden until the script fills it, so without JavaScript nothing half-built shows.
+// It sits in a rail beside <main>'s column and sticks near the top of the window as the page
+// scrolls, so it starts below the site header instead of on top of it.
 ---
 
-<nav class="section-nav" aria-label="On this page" hidden>
-  <ol></ol>
-</nav>
+<div class="section-nav-rail">
+  <nav class="section-nav" aria-label="On this page" hidden>
+    <ol></ol>
+  </nav>
+</div>
 
 <script>
   const nav = document.querySelector('.section-nav');
@@ -50,20 +54,30 @@
 </script>
 
 <style>
-  /* Only where the margin beside the 46rem column fits a 13rem list: 46 + 2 × (13 + 2) = 76rem.
+  /* Only where the margin beside the 46rem column fits a 13rem list, its --space-5 (2rem) gap to
+     the text, and a --space-3 (1rem) gutter at the window edge: 46 + 2 × (13 + 2 + 1) = 78rem.
      If --content-width changes, change this width too.
      Media queries can't read custom properties, so the width is written out. */
-  .section-nav {
+  .section-nav-rail {
     display: none;
   }
 
-  @media (min-width: 76rem) {
-    .section-nav:not([hidden]) {
+  /* The rail runs the full height of <main> (which is position: relative), in the margin left of
+     the column: its right edge sits --space-5 left of the text. Starting at <main>'s top keeps the
+     list below the site header; sticky keeps it in view from there down. */
+  @media (min-width: 78rem) {
+    .section-nav-rail {
       display: block;
-      position: fixed;
-      top: var(--space-6);
-      left: calc((100vw - var(--content-width)) / 2 - 13rem - var(--space-5));
+      position: absolute;
+      top: var(--space-6); /* level with the first line of <main>, after its top padding */
+      bottom: 0;
+      left: calc(var(--space-3) - var(--space-5) - 13rem);
       width: 13rem;
+    }
+
+    .section-nav {
+      position: sticky;
+      top: var(--space-6);
     }
   }
 
@@ -76,12 +90,14 @@
     line-height: var(--leading-tight);
   }
 
-  li + li {
+  /* The items and links are made by the script, so Astro's scoped styles don't reach them;
+     :global() does, kept inside .section-nav so nothing else on the page is affected. */
+  .section-nav :global(li + li) {
     margin-top: var(--space-2);
   }
 
   /* A left bar marks each item; it turns accent for the current section. */
-  a {
+  .section-nav :global(a) {
     display: block;
     padding-left: var(--space-2);
     border-left: 2px solid var(--color-border);
@@ -89,11 +105,11 @@
     text-decoration: none;
   }
 
-  a:hover {
+  .section-nav :global(a:hover) {
     color: var(--color-text);
   }
 
-  a[aria-current] {
+  .section-nav :global(a[aria-current]) {
     border-left-color: var(--color-accent);
     color: var(--color-accent);
   }
