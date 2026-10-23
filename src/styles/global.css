@@ -16,6 +16,7 @@ body {
 
 /* Centered content column; the side padding keeps text off the screen edge on phones. */
 main {
+  position: relative; /* anchors SectionNav's rail in the left margin */
   max-width: var(--content-width);
   margin-inline: auto;
   padding: var(--space-6) var(--space-3);

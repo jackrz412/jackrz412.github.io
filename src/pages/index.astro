@@ -31,9 +31,9 @@ const inProgress = projects.filter((p) => p.data.status === 'in-progress');
   )}
 
   {inProgress.length > 0 && (
-    <section id="in-progress">
-      <h2 class="ruled">In progress</h2>
-      <ProjectGrid projects={inProgress} label="Projects in progress" />
+    <section id="upcoming">
+      <h2 class="ruled">Upcoming</h2>
+      <ProjectGrid projects={inProgress} label="Upcoming projects" />
     </section>
   )}
 
