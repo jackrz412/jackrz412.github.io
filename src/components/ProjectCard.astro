@@ -6,10 +6,11 @@
 import type { CollectionEntry } from 'astro:content';
 import HouseGrid from './art/HouseGrid.astro';
 import MacMiniOrbit from './art/MacMiniOrbit.astro';
+import MonitorMini from './art/MonitorMini.astro';
 
 // Custom card art, by the `art` key in a project's front matter. A project without one keeps the
 // plain placeholder.
-const ART = { 'house-grid': HouseGrid, 'mac-mini-orbit': MacMiniOrbit };
+const ART = { 'house-grid': HouseGrid, 'mac-mini-orbit': MacMiniOrbit, 'monitor-mini': MonitorMini };
 
 interface Props {
   project: CollectionEntry<'projects'>['data'];

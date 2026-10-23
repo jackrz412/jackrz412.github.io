@@ -1,0 +1,81 @@
+---
+// Card art for this site: a silhouette of a computer monitor on its stand, with a Mac mini beside
+// it on the same desk line. Solid navy like the other cards' art; the screen is a lighter inset so
+// it reads as a display, and the Mac mini's front ports are cut out. Decorative (the card hides it
+// from screen readers). Colors are tokens.
+
+// 16:9: a 384 x 216 viewBox.
+const W = 384;
+const H = 216;
+const DESK = 186; // the line both pieces stand on
+
+// The monitor: a 16:9-ish screen on a neck and a flat foot.
+const SCREEN_W = 196;
+const SCREEN_H = 116;
+const BEZEL = 7;
+const NECK_W = 22;
+const NECK_H = 26;
+const FOOT_W = 84;
+const FOOT_H = 8;
+
+// The Mac mini, front view: a low box, two USB-C slots and a headphone jack.
+const MINI_W = 60;
+const MINI_H = 20;
+const GAP = 22; // between the monitor and the Mac mini
+
+// Center the pair across the frame.
+const total = SCREEN_W + GAP + MINI_W;
+const monitorX = (W - total) / 2;
+const screenY = DESK - FOOT_H - NECK_H - SCREEN_H;
+const centerX = monitorX + SCREEN_W / 2;
+const miniX = monitorX + SCREEN_W + GAP;
+const miniY = DESK - MINI_H;
+const portY = miniY + MINI_H / 2;
+---
+
+<svg class="monitor-mini" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+  <!-- Monitor: screen with a lighter inset, then the neck and foot. -->
+  <rect class="solid" x={monitorX} y={screenY} width={SCREEN_W} height={SCREEN_H} rx="6" />
+  <!-- The screen: paper first, then navy at partial opacity on top, so it shows lighter than the
+       bezel (partial navy straight onto solid navy would look the same as the bezel). -->
+  {['paper', 'screen'].map((cls) => (
+    <rect
+      class={cls}
+      x={monitorX + BEZEL}
+      y={screenY + BEZEL}
+      width={SCREEN_W - 2 * BEZEL}
+      height={SCREEN_H - 2 * BEZEL}
+      rx="2"
+    />
+  ))}
+  <rect class="solid" x={centerX - NECK_W / 2} y={screenY + SCREEN_H} width={NECK_W} height={NECK_H} />
+  <rect class="solid" x={centerX - FOOT_W / 2} y={DESK - FOOT_H} width={FOOT_W} height={FOOT_H} rx="3" />
+
+  <!-- Mac mini, with its front ports cut out in the paper color. -->
+  <rect class="solid" x={miniX} y={miniY} width={MINI_W} height={MINI_H} rx="5" />
+  <rect class="port" x={miniX + 12} y={portY - 2} width="8" height="4" rx="2" />
+  <rect class="port" x={miniX + 23} y={portY - 2} width="8" height="4" rx="2" />
+  <circle class="port" cx={miniX + 37} cy={portY} r="2" />
+</svg>
+
+<style>
+  .monitor-mini {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .solid {
+    fill: var(--color-accent);
+  }
+
+  .screen {
+    fill: var(--color-accent);
+    opacity: 0.55;
+  }
+
+  .paper,
+  .port {
+    fill: var(--color-surface);
+  }
+</style>
