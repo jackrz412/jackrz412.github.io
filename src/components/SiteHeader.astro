@@ -1,7 +1,8 @@
 ---
 // The header on every page: name at left (a link home), small site links at right: About,
 // Projects, GitHub, Contact.
-// Projects and Contact point at the homepage's sections, so they work from any page.
+// Projects points at the homepage's section, so it works from any page.
+import { github, profileRel } from '../data/contact';
 import home from '../data/home.json';
 
 // The link to the page you're on is marked aria-current, so screen readers say "current page".
@@ -18,8 +19,8 @@ const current = (href: string) => (path === trim(href) ? 'page' : undefined);
       <ul>
         <li><a href="/about/" aria-current={current('/about/')}>About</a></li>
         <li><a href="/#projects">Projects</a></li>
-        <li><a href={home.contact.github}>GitHub</a></li>
-        <li><a href="/#contact">Contact</a></li>
+        <li><a href={github.url} target="_blank" rel={profileRel}>{github.label}<span class="sr-only"> (opens in new tab)</span></a></li>
+        <li><a href="/contact/" aria-current={current('/contact/')}>Contact</a></li>
       </ul>
     </nav>
   </div>

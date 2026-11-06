@@ -2,9 +2,8 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BlinkCursor from '../components/BlinkCursor.astro';
-import ContactLinks from '../components/ContactLinks.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
-// The site's words (name, tagline, bio, contact links), kept apart from the layout.
+// The site's words (name, tagline, bio), kept apart from the layout.
 import home from '../data/home.json';
 
 // Every project in src/content/projects/, split by status. ProjectGrid sorts each list.
@@ -39,8 +38,7 @@ const inProgress = projects.filter((p) => p.data.status === 'in-progress');
 
   <section id="contact">
     <h2>Contact</h2>
-    <p>{home.contactLine}</p>
-    <ContactLinks />
+    <p>{home.contactLine} <a href="/contact/">{home.contactLinkText}</a></p>
   </section>
 </BaseLayout>
 

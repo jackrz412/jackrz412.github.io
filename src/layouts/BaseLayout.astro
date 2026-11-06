@@ -7,6 +7,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '../styles/global.css';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import home from '../data/home.json';
 
 interface Props {
   title: string;
@@ -14,6 +15,9 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+// The page's full address, for link previews: the site's domain (astro.config.mjs) plus its path.
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -23,6 +27,13 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <!-- Open Graph: what LinkedIn, Slack and others show when a link to this page is pasted. -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content={home.name} />
+    <slot name="head" />
   </head>
   <body>
     <!-- Reading progress: a line across the top that fills as the page scrolls. -->

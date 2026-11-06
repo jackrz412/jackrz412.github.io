@@ -1,0 +1,201 @@
+---
+// The contact page: my profiles set out like a paper's numbered references, main one first.
+// The links come from contact.ts, so this page only decides how they look.
+import fs from 'node:fs';
+import path from 'node:path';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlinkCursor from '../components/BlinkCursor.astro';
+import { clearanceJobsNote, profileRel, profiles, resumePath } from '../data/contact';
+import home from '../data/home.json';
+
+// Checked at build time, from the project folder (where npm run build runs).
+const hasResume = fs.existsSync(path.join(process.cwd(), 'public', resumePath));
+
+// JSON-LD: a description of me in a standard format, read by search engines rather than people.
+// sameAs lists my profiles elsewhere, so they can tell these accounts are all the same person.
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: home.name,
+  url: Astro.site?.href,
+  sameAs: profiles.map((profile) => profile.url),
+};
+---
+
+<BaseLayout
+  title={`Contact | ${home.name}`}
+  description="How to reach Jack Roberts: LinkedIn first, GitHub for code."
+>
+  <script slot="head" is:inline type="application/ld+json" set:html={JSON.stringify(person)} />
+
+  <header>
+    <h1>Contact<BlinkCursor /></h1>
+    <p class="lead">{home.contactLine}</p>
+    <p class="status">Open to applied AI engineering roles.</p>
+  </header>
+
+  <section aria-labelledby="references-title">
+    <h2 id="references-title" class="eyebrow">References</h2>
+    <ol class="references">
+      {profiles.map((profile, index) => (
+        <li class:list={['entry', { primary: profile.priority === 1 }]}>
+          {/* Hidden from screen readers, because the <ol> already announces the number. */}
+          <span class="ref" aria-hidden="true">[{index + 1}]</span>
+          <div>
+            <p class="title">
+              <a class="link" href={profile.url} target="_blank" rel={profileRel}>{profile.label}<span class="arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in new tab)</span></a>
+              {profile.priority === 1 && <span class="tag">Primary</span>}
+            </p>
+            <p class="handle"><code>{profile.handle}</code></p>
+            <p class="description">{profile.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="note">{clearanceJobsNote}</p>
+    {hasResume && <p class="note"><a href={resumePath}>Resume (PDF)</a></p>}
+  </section>
+</BaseLayout>
+
+<style>
+  .lead {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+
+  .status {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  section {
+    margin-top: var(--space-6);
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--space-3);
+    color: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* The numbered list: thin rules between entries, numbers in their own narrow column. */
+  .references {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+    list-style: none;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    align-items: baseline;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .entry.primary {
+    padding-block: var(--space-4);
+  }
+
+  .ref,
+  .handle {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-3);
+    margin: 0 0 var(--space-1);
+    font-weight: var(--weight-semibold);
+  }
+
+  .primary .title {
+    font-size: var(--text-lg);
+  }
+
+  .tag {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .handle {
+    margin: 0;
+    overflow-wrap: anywhere; /* a long handle wraps rather than pushing past a phone's edge */
+  }
+
+  .description {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  .note {
+    margin: var(--space-4) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-md);
+  }
+
+  /* Two lines under each link: a thin resting one, so it reads as a link with motion off, and an
+     accent one that hover and keyboard focus reveal. Each is its own layer, so the accent line
+     can animate with transform rather than by changing the width. */
+  .link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .link::before,
+  .link::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .link::before {
+    border-bottom: 1px solid var(--color-muted);
+  }
+
+  .link::after {
+    border-bottom: 2px solid var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .link:hover::after,
+  .link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .arrow {
+    display: inline-block;
+    margin-left: var(--space-1);
+  }
+
+  /* With motion allowed, the line draws in from the left and the arrow nudges up and right.
+     Otherwise the line simply appears and the arrow stays still. */
+  @media (prefers-reduced-motion: no-preference) {
+    .link::after,
+    .arrow {
+      transition: transform var(--duration-fast) var(--ease);
+    }
+
+    .link:hover .arrow,
+    .link:focus-visible .arrow {
+      transform: translate(2px, -2px);
+    }
+  }
+</style>

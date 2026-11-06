@@ -100,6 +100,16 @@ code {
   outline-offset: 2px;
 }
 
+/* Text for screen readers only: kept in the page but clipped to nothing on screen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Linked highlighting (set by the page script): one model is active, the rest are dimmed.
    Chart marks and color-key items dim; model names in text never dim, since faded text is hard
    to read. Instead the matching names get a ring in their own text color. */
