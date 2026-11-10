@@ -4,6 +4,7 @@ summary: "A turn-of-the-century train tycoon game, where the goal is to monopoli
 status: in-progress
 date: 2026-07-01
 tools: [Godot 4.7.2, GDScript]
-# Card art to come, from the game's loading screen.
+# Card art: the game's title screen, cropped, public/images/projects/bearin-east.png.
+image: /images/projects/bearin-east.png
 order: 4
 ---
