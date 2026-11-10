@@ -4,6 +4,6 @@ summary: Under wraps for now.
 status: in-progress
 date: 2026-10-23
 tools: []
-# Placeholder card for the In progress section; order keeps 1-4 in sequence.
-order: 2
+# Placeholder card for the Upcoming section, after the named projects; order keeps 5-6 in sequence.
+order: 6
 ---

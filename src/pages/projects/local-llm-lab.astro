@@ -99,8 +99,7 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
     <p>
       Each of the {models.length} models answered all 12 prompts {summary.runs_per_prompt} times,
       for {totalAnswers} graded answers. The results tell me which model to use for later
-      projects, and where a model can't be trusted on its own. In these cases, manual
-      verification will need to be done to ensure maximum accuracy.
+      projects, and where a model's output can't be trusted without a human check.
     </p>
     <p>
       The whole method runs on a few Python scripts: one sends every prompt to each model

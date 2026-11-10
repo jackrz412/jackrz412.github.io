@@ -21,8 +21,10 @@ const projects = defineCollection({
       // The project page: a site path like /projects/local-llm-lab/ or a full URL.
       href: z.string().optional(),
       repo: z.url().optional(),
-      // Key for the project's custom card art (built in a later stage).
+      // Key for the project's drawn card art (a component in src/components/art/).
       art: z.string().optional(),
+      // Or a picture for the card art instead: a site path to a file in public/, shown 16:9.
+      image: z.string().optional(),
       // Manual sort position; projects without one sort newest first.
       order: z.number().optional(),
     })

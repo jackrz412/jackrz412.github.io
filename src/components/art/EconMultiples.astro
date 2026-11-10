@@ -1,0 +1,103 @@
+---
+// Card art for "Some Points on the US Economy": a small multiples grid, eight tiny line charts
+// like a dashboard of indicators. Every panel shades the same recession band, and each line
+// bends there (some dip, some spike), so the panels read as one economy. Decorative (the card
+// hides it from screen readers). Colors are tokens; the lines are computed, not random, so every
+// build is the same.
+
+// 16:9: a 384 x 216 viewBox, 4 x 2 panels.
+const W = 384;
+const H = 216;
+const COLS = 4;
+const ROWS = 2;
+const PAD = 16; // frame edge to the panels
+const GAP = 12; // between panels
+const PW = (W - 2 * PAD - (COLS - 1) * GAP) / COLS;
+const PH = (H - 2 * PAD - (ROWS - 1) * GAP) / ROWS;
+const INSET = 10; // panel edge to its line
+const POINTS = 30;
+
+// Where the shared recession sits, as a share of each panel's width.
+const RECESSION = [0.55, 0.66];
+const SHOCK = 0.6; // the center of each line's dip or spike
+
+// One indicator per panel: a long-run trend, a wave on top, and its move in the recession
+// (positive dips, negative spikes, like unemployment).
+const SERIES = [
+  { trend: 0.9, wave: 0.06, freq: 7, shock: 0.35 },
+  { trend: -0.5, wave: 0.08, freq: 11, shock: -0.45 },
+  { trend: 0.4, wave: 0.15, freq: 6, shock: 0.25 },
+  { trend: 1.1, wave: 0.04, freq: 13, shock: 0.2 },
+  { trend: 0.2, wave: 0.18, freq: 8, shock: 0.4 },
+  { trend: -0.3, wave: 0.1, freq: 5, shock: 0.3 },
+  { trend: 0.7, wave: 0.12, freq: 10, shock: -0.3 },
+  { trend: 0.5, wave: 0.07, freq: 15, shock: 0.5 },
+];
+
+type Series = (typeof SERIES)[number];
+const value = (s: Series, t: number) =>
+  s.trend * t + s.wave * Math.sin(t * s.freq) - s.shock * Math.exp(-(((t - SHOCK) / 0.05) ** 2));
+
+const innerW = PW - 2 * INSET;
+const panels = SERIES.map((s, i) => {
+  const x = PAD + (i % COLS) * (PW + GAP);
+  const y = PAD + Math.floor(i / COLS) * (PH + GAP);
+  const values = Array.from({ length: POINTS }, (_, k) => value(s, k / (POINTS - 1)));
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  // Each panel gets its own vertical scale, as small multiples of different indicators would.
+  const points = values.map((v, k) => [
+    x + INSET + (k / (POINTS - 1)) * innerW,
+    y + PH - INSET - ((v - lo) / (hi - lo)) * (PH - 2 * INSET),
+  ]);
+  return {
+    x,
+    y,
+    line: 'M' + points.map(([px, py]) => `${px.toFixed(1)} ${py.toFixed(1)}`).join(' L'),
+    end: points[POINTS - 1],
+    bandX: x + INSET + RECESSION[0] * innerW,
+    bandW: (RECESSION[1] - RECESSION[0]) * innerW,
+  };
+});
+---
+
+<svg class="econ-multiples" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+  {panels.map((p) => (
+    <g>
+      <rect class="panel" x={p.x} y={p.y} width={PW} height={PH} rx="3" />
+      <rect class="band" x={p.bandX} y={p.y + INSET} width={p.bandW} height={PH - 2 * INSET} />
+      <path class="line" d={p.line} />
+      <circle class="end" cx={p.end[0]} cy={p.end[1]} r="2.5" />
+    </g>
+  ))}
+</svg>
+
+<style>
+  .econ-multiples {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .panel {
+    fill: var(--color-bg);
+    stroke: var(--color-border);
+  }
+
+  .band {
+    fill: var(--color-muted);
+    opacity: 0.14;
+  }
+
+  .line {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.75;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .end {
+    fill: var(--color-accent);
+  }
+</style>

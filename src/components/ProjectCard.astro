@@ -4,21 +4,28 @@
 // clickable but screen readers hear just the title. In-progress cards have no link, a dashed
 // border, and a faded art area.
 import type { CollectionEntry } from 'astro:content';
+import EconMultiples from './art/EconMultiples.astro';
 import HouseGrid from './art/HouseGrid.astro';
 import MacMiniOrbit from './art/MacMiniOrbit.astro';
 import MonitorMini from './art/MonitorMini.astro';
 
-// Custom card art, by the `art` key in a project's front matter. A project without one keeps the
-// plain placeholder.
-const ART = { 'house-grid': HouseGrid, 'mac-mini-orbit': MacMiniOrbit, 'monitor-mini': MonitorMini };
+// Custom card art: a drawn component by the `art` key in a project's front matter, or a picture
+// by its `image` path. A project with neither keeps the plain placeholder.
+const ART = {
+  'econ-multiples': EconMultiples,
+  'house-grid': HouseGrid,
+  'mac-mini-orbit': MacMiniOrbit,
+  'monitor-mini': MonitorMini,
+};
 
 interface Props {
   project: CollectionEntry<'projects'>['data'];
 }
 
 const { project } = Astro.props;
-const { title, summary, status, date, tools, href, art } = project;
+const { title, summary, status, date, tools, href, art, image } = project;
 const Art = art ? ART[art as keyof typeof ART] : undefined;
+const hasArt = Boolean(Art || image);
 const isLink = status === 'live' && href;
 // Links that leave the site get an arrow, so visitors know they're going to GitHub.
 const isExternal = isLink && /^https?:/.test(href);
@@ -30,7 +37,9 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
 ---
 
 <article class:list={['card', status]}>
-  <div class:list={['art', Art && 'has-art']} aria-hidden="true">{Art && <Art />}</div>
+  <div class:list={['art', hasArt && 'has-art', !Art && image && 'has-image']} aria-hidden="true">
+    {Art ? <Art /> : image && <img src={image} alt="" loading="lazy" />}
+  </div>
   <h3>
     {isLink ? (
       <a href={href}>{title}{isExternal && <span class="external" aria-hidden="true"> ↗</span>}</a>
@@ -66,6 +75,14 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
 
   .art.has-art {
     overflow: hidden;
+  }
+
+  /* A picture fills the art area, cropped to 16:9 from its center if its shape differs. */
+  .art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   h3 {
@@ -126,7 +143,8 @@ const meta = [tools.join(', '), month].filter(Boolean).join(' · ');
     border-style: dashed;
   }
 
-  .card.in-progress .art {
+  /* Pictures are drawn pale already, so they aren't faded a second time. */
+  .card.in-progress .art:not(.has-image) {
     opacity: 0.5;
   }
 </style>
