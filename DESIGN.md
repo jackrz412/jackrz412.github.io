@@ -149,8 +149,6 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 - `text-wrap: balance` on headings, `text-wrap: pretty` on paragraphs.
 - Section labels (eyebrows) in mono uppercase. Today they are sans.
 - Heading anchor links, so findings can be linked directly.
-- Open Graph preview image (`og:image`). The text tags are in `BaseLayout`.
-- Favicon.
 - Sidenotes in the margin on wide screens, falling back to inline notes on phones.
 
 ## 7. Components
@@ -173,6 +171,7 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 | `ModelKey` | `src/components/` | A color key of the models in `summary.json`, next to charts colored by model |
 | `QuoteCard` | `src/components/` | A model's output on a card: model / question / run table, centered output, explanation tagged pass or fail |
 | `.model-name` class | `global.css` | Any model name in running text |
+| Site icons and preview image | `public/` | `favicon.svg` (the navy block cursor on paper) with `favicon-32.png` and `apple-touch-icon.png` (180px) made from it, and `og-image.png` (1200×630: name in Plex Serif with the cursor, a line in Plex Sans, the address in Plex Mono). Linked from `BaseLayout` on every page. The one exception to "no hex values": image files can't read tokens, so these hold the `tokens.css` values written out. Remake them if the tokens or name change |
 | Photo pair (`.photos`) | page-local (About) | Two square photos side by side, stacked on phones. Metadata is stripped before a photo goes in `public/`, and every photo has alt text |
 | Stat tiles (`.stat-tiles`) | page-local | A row of 3–4 headline numbers (will become `StatTile`) |
 | Intro panel (`.intro-panel`) | page-local | Grouping a page's setup sections on `--color-surface` |

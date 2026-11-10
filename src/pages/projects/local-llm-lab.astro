@@ -59,7 +59,12 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
 
   <!-- Headline + takeaway -->
   <header>
+    <p class="eyebrow kicker">Local LLM Lab</p>
     <h1>Local LLMs and the Humble Mac mini<BlinkCursor /></h1>
+    <ul class="links-row" aria-label="Project links">
+      <li><a href={repoUrl}>GitHub repo</a></li>
+      <li><a href={scorecardUrl}>Full scorecard</a></li>
+    </ul>
     <hr class="results-rule under-title" />
     <p class="eyebrow under-title">Summary up front</p>
     <p>
@@ -73,7 +78,7 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
   <div class="intro-panel">
   <!-- About the benchmark -->
   <section id="the-benchmark">
-    <h2>The Benchmark</h2>
+    <h2>The benchmark</h2>
     <p>
       I split the benchmark into two prompt sets covering nine question types. A general set
       (5 prompts) acts as a baseline of everyday tasks. A specialized set (7 prompts) is built
@@ -106,7 +111,7 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
 
   <!-- Stat row -->
   <section id="key-figures" aria-labelledby="key-figures-title">
-    <h2 id="key-figures-title">Key Figures</h2>
+    <h2 id="key-figures-title">Key figures</h2>
     <ul class="stat-tiles">
       <li><strong>{models.length}</strong> models</li>
       <li><strong>{totalAnswers}</strong> graded answers</li>
@@ -117,7 +122,7 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
 
   <!-- Model color key -->
   <section id="models-used" aria-labelledby="models-used-title">
-    <h2 id="models-used-title">Models Used</h2>
+    <h2 id="models-used-title">Models used</h2>
     <ModelKey />
   </section>
   </div>
@@ -493,6 +498,28 @@ const okunJsonAccepted = promptPasses(summary.scorecard.json_accepted, ['okun-js
 
   .eyebrow.under-title {
     margin-bottom: var(--space-3);
+  }
+
+  /* The project name above the title, in the eyebrow style, as on the other project pages. */
+  .eyebrow.kicker {
+    margin-bottom: var(--space-2);
+  }
+
+  /* Compact links under the title, separated by middle dots. */
+  .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .links-row li + li::before {
+    content: '·';
+    margin-right: var(--space-3);
+    color: var(--color-muted);
   }
 </style>
 

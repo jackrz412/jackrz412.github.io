@@ -18,6 +18,8 @@ const { title, description } = Astro.props;
 
 // The page's full address, for link previews: the site's domain (astro.config.mjs) plus its path.
 const pageUrl = new URL(Astro.url.pathname, Astro.site);
+// One preview image for every page (public/og-image.png). Previews need a full address.
+const ogImage = new URL('/og-image.png', Astro.site);
 ---
 
 <!doctype html>
@@ -27,12 +29,23 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <!-- Site icons: browsers that read SVG use the sharp vector icon; the rest fall back to the PNG.
+         Apple devices use their own larger icon for home-screen shortcuts. -->
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Open Graph: what LinkedIn, Slack and others show when a link to this page is pasted. -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:site_name" content={home.name} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Jack Roberts: data analysis and AI engineering projects." />
+    <!-- Asks X and similar sites for the large image layout rather than a small thumbnail. -->
+    <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
   </head>
   <body>

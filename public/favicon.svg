@@ -1,0 +1,6 @@
+<!-- Site icon: the title's navy block cursor on paper. The colors are the paper and accent
+     tokens from tokens.css, written out because an icon file can't read CSS variables. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#FAF8F3"/>
+  <rect x="10" y="5" width="12" height="22" fill="#1F4E79"/>
+</svg>
