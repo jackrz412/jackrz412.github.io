@@ -140,6 +140,7 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 | Chart draw-in | When a chart first scrolls into view (IntersectionObserver, once), bars grow from the baseline and dots fade and scale in, staggered by model, over `--duration-slow`. Stagger: one `--duration-fast` step per model. Heatmap cells change color over `--duration-fast` when a toggle changes the data. CSS keyframe animations (not transitions), so they never delay the highlight's opacity changes. Static: charts are fully drawn | Every chart with bars or dots. Only the marks animate, never axes, text or reference lines | `byModel(data, kind)` in the page script; `modelDots` includes it | CURRENT |
 | Section navigator | A sticky list of the page's sections in the left margin, using mono labels. Highlights the section in view (IntersectionObserver) and jumps to it on click. A `<nav>` with an `aria-label`; the current item has `aria-current`. Hidden on narrow screens | Long pages with 4 or more `h2` sections. A section can set `data-nav-label` for a shorter label. Jumps stop `--space-5` short of the section (`scroll-margin-top` on `section[id]` in `global.css`) | `SectionNav` component (`<SectionNav />` once in the page); shows from 78rem wide | CURRENT |
 | Linked highlighting | Hovering (mouse), keyboard-focusing or tapping (touch, toggles) a model name anywhere (text, color key, chart marks) highlights that model: chart marks and key items for other models dim to 25% opacity over `--duration-fast`. Model names in text never dim; matching ones get a 1px ring in their own color. One shared state per page (`setHighlight(model)`). Model names and key items are focusable. Static: the highlight still applies, instantly | Any page where one model's results appear in several places. Every chart mark for a model carries `data-model` (via `byModel`) | Page script (`setHighlight`), styles in `global.css` | CURRENT |
+| Link underline draw | A profile link rests on a thin muted line. On hover or keyboard focus a 2px accent line draws in from the left (`scaleX`) and the ↗ moves 2px diagonally, over `--duration-fast`. Static: the accent line appears at once and the arrow stays still | The contact page's profile links | `contact.astro` | CURRENT |
 | Speed race | One row per model, ordered by size, each streaming the same ~25-word sentence at that model's measured speed (characters per second from `summary.json`). Starts when in view, shows each finish time, has a Replay button. `qwen3.5:9b` is labeled answer-only speed (thinking excluded). Typing is paced by the data (a script, not CSS motion), so like the time split it is exempt from the duration tokens. Static: the HTML is the finished race, with times written out; the script only replays it | Showing a speed difference people should feel, not just read | `SpeedRace` component (Speed and size section) | CURRENT |
 
 ## 6. Planned details (not built yet)
@@ -148,7 +149,7 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 - `text-wrap: balance` on headings, `text-wrap: pretty` on paragraphs.
 - Section labels (eyebrows) in mono uppercase. Today they are sans.
 - Heading anchor links, so findings can be linked directly.
-- Open Graph preview image and tags (`og:title`, `og:description`, `og:image`).
+- Open Graph preview image (`og:image`). The text tags are in `BaseLayout`.
 - Favicon.
 - Sidenotes in the margin on wide screens, falling back to inline notes on phones.
 
@@ -160,8 +161,10 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 | --- | --- | --- |
 | `BaseLayout` | `src/layouts/` | Every page: fonts, global styles, the site header, the centered column, the reading progress bar, `title` and `description` |
 | `SiteFooter` | `src/components/` | The footer on every page (via `BaseLayout`): colophon (fonts, tools, a link to the code) and "Updated Mon YYYY", set at build time in US Eastern time |
-| `ContactLinks` | `src/components/` | Email, LinkedIn, GitHub, Resume links from `home.json`. Skips any still set to `"TODO"`; shows the resume only when its file exists in `public/`. The email is stored reversed in two halves and assembled into a mailto link by script, so it never appears in the HTML |
-| `SiteHeader` | `src/components/` | The header on every page (via `BaseLayout`): name at left linking home, small links at right (About, Projects, GitHub, Contact). Section links use `/#id` so they work from any page; the current page's link has `aria-current="page"` and the accent color. Text from `src/data/home.json`. A 2px `--color-accent` bar runs the full window width under it |
+| `contact.ts` | `src/data/` | The one source for profile links: `label`, `url`, `handle`, `description`, `priority`, plus the resume path. The links appear on the contact page; the header reads GitHub from here; the homepage only links to the contact page |
+| References list (`.references`) | page-local (contact page) | Numbered profile entries: `[n]` in mono, the priority 1 entry larger with a "Primary" tag, handles in mono, thin rules between entries. Shows the resume only when its file exists in `public/` |
+| `.sr-only` class | `global.css` | Text for screen readers only, such as "(opens in new tab)" on profile links |
+| `SiteHeader` | `src/components/` | The header on every page (via `BaseLayout`): name at left linking home, small links at right (About, Projects, GitHub, Contact). Projects uses `/#projects` so it works from any page; the current page's link has `aria-current="page"` and the accent color. Text from `src/data/home.json`, the GitHub link from `src/data/contact.ts`. A 2px `--color-accent` bar runs the full window width under it |
 | `SectionNav` | `src/components/` | The section list in the left margin on wide screens; lists every `section[id]` with an `h2` |
 | `SpeedRace` | `src/components/` | The speed race: one row per model, by size, typing one sentence at its measured characters per second |
 | `ProjectCard` | `src/components/` | One project from the `projects` collection: 16:9 art area, title, summary, mono meta line (tools · Mon YYYY). Live cards are one link (the title link stretched over the card; external links get ↗). In-progress cards: dashed border, faded art, no link |
@@ -170,6 +173,7 @@ Built with Observable Plot in the page's `<script>`. Colors and fonts are read f
 | `ModelKey` | `src/components/` | A color key of the models in `summary.json`, next to charts colored by model |
 | `QuoteCard` | `src/components/` | A model's output on a card: model / question / run table, centered output, explanation tagged pass or fail |
 | `.model-name` class | `global.css` | Any model name in running text |
+| Photo pair (`.photos`) | page-local (About) | Two square photos side by side, stacked on phones. Metadata is stripped before a photo goes in `public/`, and every photo has alt text |
 | Stat tiles (`.stat-tiles`) | page-local | A row of 3–4 headline numbers (will become `StatTile`) |
 | Intro panel (`.intro-panel`) | page-local | Grouping a page's setup sections on `--color-surface` |
 | Results rule + eyebrow | page-local | Marking where the findings begin |
